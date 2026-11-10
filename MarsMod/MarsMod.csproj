@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>MarsMod</AssemblyName>
+    <RootNamespace>MarsMod</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Version>0.8.0</Version>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <NoWarn>CS0618;CS8632;MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- BepInEx 6.0.0-be.791 (Unity.IL2CPP) -->
+    <Reference Include="BepInEx.Core"><HintPath>..\lib\BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP"><HintPath>..\lib\BepInEx.Unity.IL2CPP.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.Unity.Common"><HintPath>..\lib\BepInEx.Unity.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>..\lib\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>..\lib\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>..\lib\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <!-- Stub Unity references (the ones BepInEx compiles against) -->
+    <Reference Include="Il2Cppmscorlib"><HintPath>..\lib\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>..\lib\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <!-- The game's own interop assemblies, generated on the user's PC by the MoonSweepers BepInEx Patcher -->
+    <Reference Include="Assembly-CSharp"><HintPath>..\lib\interop\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="com.rlabrecque.steamworks.net"><HintPath>..\lib\interop\com.rlabrecque.steamworks.net.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\assets\art\poster_keep_calm.png" LogicalName="poster_keep_calm.png" />
+    <EmbeddedResource Include="..\assets\art\card_*.png" LogicalName="%(Filename).png" />
+    <EmbeddedResource Include="..\assets\models\*.glb" LogicalName="model.%(Filename).glb" />
+  </ItemGroup>
+</Project>
