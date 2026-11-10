@@ -1,0 +1,20 @@
+Mars Sweepers uses or ships the following third-party work.
+
+BepInEx 6 (Unity IL2CPP build be.791)
+  https://github.com/BepInEx/BepInEx, LGPL-2.1. Bundled unmodified by the installer.
+
+Il2CppInterop, HarmonyX
+  https://github.com/BepInEx/Il2CppInterop (LGPL-3.0), https://github.com/BepInEx/HarmonyX (MIT).
+  Shipped as part of BepInEx.
+
+Narrator voice
+  The narrator lines in assets/voice.zip were spoken with Chatterbox TTS by Resemble AI
+  (https://github.com/resemble-ai/chatterbox, MIT), default voice.
+
+"Keep Calm" cat poster (assets/art/poster_keep_calm.png)
+  Subnautica fan art used under the Unknown Worlds fan content policy: free, non-commercial,
+  not behind a paywall. Unknown Worlds is not affiliated with or endorsing this mod.
+
+Moon Sweepers
+  The game, its code, models and textures belong to DragDrop Games. Nothing of it is in this
+  repository; the reference assemblies a build needs are made from your own copy (lib/README.md).
