@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- .NET Framework 4.8 ships with every Windows 10/11, so the exe runs without installing anything. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>MarsSetup</AssemblyName>
+    <RootNamespace>MarsSetup</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <Version>0.8.0</Version>
+    <Product>Mars Sweepers setup</Product>
+    <Description>Installs BepInEx, the MoonSweepers BepInEx Patcher and the MarsProbe debug mod into Moon Sweepers.</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\lib\BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.791.zip" LogicalName="BepInEx.zip" />
+    <EmbeddedResource Include="..\MarsProbe\bin\Release\net6.0\MarsProbe.dll" LogicalName="MarsProbe.dll" />
+    <EmbeddedResource Include="..\MarsMod\bin\Release\net6.0\MarsMod.dll" LogicalName="MarsMod.dll" />
+    <EmbeddedResource Include="..\assets\voice.zip" LogicalName="voice.zip" />
+  </ItemGroup>
+
+</Project>
