@@ -1,4 +1,5 @@
-Mars Sweepers uses or ships the following third-party work.
+Mars Sweepers is MIT licensed (LICENSE). It uses or ships the following third-party work,
+which keeps its own terms.
 
 BepInEx 6 (Unity IL2CPP build be.791)
   https://github.com/BepInEx/BepInEx, LGPL-2.1. Bundled unmodified by the installer.

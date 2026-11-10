@@ -3,6 +3,11 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## Unreleased
+
+### Changed
+- Licensed under MIT (was all rights reserved).
+
 ## 0.8.0
 
 ### Added

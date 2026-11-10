@@ -49,7 +49,11 @@ markers (`port_N`, `anchor_*`, `anim_spin_*`, `COL_*`). The loader maps the
 material names to the game's own materials, so Mars machines are lit and
 shaded like the game's.
 
-## Licence: all rights reserved, for now
+## Licence: MIT
 
-The repository is private while the mod and the shared standard take shape.
-Which licence it gets when it goes public is open.
+The mod is meant to be read and copied: it is the first project built the
+way the shared Moon Sweepers modding standard is meant to work, and its
+hooks, save side file and building registry are examples for other mods.
+MIT asks nothing of them but the notice. Third-party parts keep their own
+terms (NOTICE): the poster stays under the Unknown Worlds fan content
+policy (non-commercial), the narrator voice under Chatterbox's MIT.

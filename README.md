@@ -13,7 +13,7 @@
 <a href="https://github.com/Elchi-dev/MarsSweepers/actions/workflows/ci.yml"><img src="https://github.com/Elchi-dev/MarsSweepers/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="#status"><img src="https://img.shields.io/badge/status-alpha-orange" alt="Status: alpha"></a>
 <a href="https://dotnet.microsoft.com"><img src="https://img.shields.io/badge/C%23-BepInEx%206%20IL2CPP-512BD4?logo=dotnet&amp;logoColor=white" alt="C# on BepInEx 6"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey" alt="License: all rights reserved"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 <a href="https://github.com/Elchi-dev"><img src="https://img.shields.io/badge/made%20by-Elchi-8A2BE2" alt="Made by Elchi"></a>
 </p>
 
@@ -155,7 +155,9 @@ second player with machines, Linux under Wine or Proton.
 
 ## License
 
-All rights reserved. See [LICENSE](LICENSE). Moon Sweepers is a game by
-DragDrop Games; this mod is not affiliated with or endorsed by them.
+MIT for the code, models and pictures made for this mod. See
+[LICENSE](LICENSE); third-party parts (BepInEx, the poster, the narrator
+voice) keep their own terms, listed in [NOTICE](NOTICE). Moon Sweepers is a
+game by DragDrop Games; this mod is not affiliated with or endorsed by them.
 
 **Made by Elchi**
