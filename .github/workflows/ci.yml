@@ -1,0 +1,18 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Text
+        run: ./tools/lint-text.sh
+      - name: Model scripts compile
+        run: python3 -m py_compile models/*.py
+      - name: Shell scripts
+        run: bash -n tools/*.sh
