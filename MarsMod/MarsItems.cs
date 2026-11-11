@@ -43,7 +43,9 @@ namespace MarsMod
             new Def { Id = "smelter", Name = "Smelter", Model = "smelter", Price = 900, Radius = 3.0f,
                       Info = "2 hematite → 1 iron plate every 6 s. Bring it ore, take the plates." },
             new Def { Id = "container", Name = "Container port", Model = "container", Price = 400, Radius = 2.1f, Category = "Logistics",
-                      Info = "Stores Mars materials for the whole crew. Deposit your backpack, sell the stock." },
+                      Info = "Stores Mars materials for the whole crew. Deposit your backpack, sell the stock at the market price." },
+            new Def { Id = "lightpole", Name = "Light pole", Model = "lightpole", Price = 60, Radius = 0.8f, Category = "Services",
+                      Info = "A bright lamp. In a dust storm the air clears up around it (about 20 m), so a line of poles makes a path home." },
         };
 
         public static Def Get(string id) => All.Find(d => d.Id == id);
