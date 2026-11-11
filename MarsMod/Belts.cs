@@ -31,15 +31,23 @@ namespace MarsMod
 
         static Belts()
         {
-            MarsData.Changed += key => { if (key == "" || key == Key) Data = MarsData.Get<State>(Key); };
+            MarsData.Changed += key =>
+            {
+                if (key != "" && key != Key) return;
+                bool was = Data.On;
+                Data = MarsData.Get<State>(Key);
+                if (Data.On && !was) PortsNow();
+            };
         }
 
         public static void Init() { }
 
         public static string Toggle(bool on)
         {
+            bool was = Data.On;
             Data.On = on; dirty = true; Save();
-            return on ? "Mars belts ON (experimental). Save and load the world once so the Mars buildings get their belt ports." : "Mars belts off (load the world again to drop the ports).";
+            if (on && !was) PortsNow();
+            return on ? "Mars belts ON (experimental): Mars buildings now have belt ports. If belts do not snap to them, save and load the world once." : "Mars belts off (load the world again to drop the ports).";
         }
 
         static void Save() { if (dirty && MarsNet.IsHost) { MarsData.Set(Key, Data); dirty = false; } }
@@ -160,6 +168,12 @@ namespace MarsMod
                 return true;
             }
             catch (Exception e) { Log.Once("belt-enter", "[belts] enter failed: " + e.Message); return false; }
+        }
+
+        /// <summary>Ports for the definitions that already exist (the Mars data may arrive after the build menu was set up).</summary>
+        static void PortsNow()
+        {
+            foreach (var e in VanillaBuild.Entries) if (e.Definition != null) SetPorts(e.Definition, e.Def);
         }
 
         public static void Reset() { Data = new State(); dirty = false; }
