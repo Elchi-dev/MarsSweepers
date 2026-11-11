@@ -299,7 +299,7 @@ namespace MarsMod
                     int level = world.TreeLevel(me, n.id);
                     while (level < max)
                     {
-                        try { world.DevAddMoney(me, new Il2CppSystem.Decimal(100000.0)); } catch { }
+                        try { Buildings.Earn(world, me, 100000.0); } catch { }
                         string msg;
                         bool ok = world.TryPurchaseTreeNode(me, n.id, level + 1, out msg) || world.TryPurchaseTreeNode(me, n.id, level, out msg);
                         if (!ok) break;

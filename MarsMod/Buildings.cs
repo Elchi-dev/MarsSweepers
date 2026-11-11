@@ -239,16 +239,40 @@ namespace MarsMod
             {
                 double have = Il2CppSystem.Decimal.ToDouble(world.WalletDollars(player));
                 if (have + 0.001 < dollars) return false;
-                world.ChargeBuild(player, new Il2CppSystem.Decimal(dollars));
+                world.ChargeBuild(player, Dec(dollars));
                 return true;
             }
             catch (Exception e) { Plugin.Log.LogWarning("[build] payment failed: " + e.Message); return false; }
         }
 
+        /// <summary>
+        /// Add money to the team wallet. MoonWorld.DevAddMoney did nothing in the release game (2026-11-11 report:
+        /// "money" asked for $10,000, the wallet stayed at $0), so the team balance is set directly and checked.
+        /// </summary>
         public static void Earn(MoonWorld world, string player, double dollars)
         {
-            try { world.DevAddMoney(player, new Il2CppSystem.Decimal(dollars)); }
+            if (world == null || dollars == 0) return;
+            try
+            {
+                double before = Il2CppSystem.Decimal.ToDouble(world.WalletDollars(player));
+                double want = Math.Round(before + dollars, 2);
+                world.SetTeamDollars(Dec(want));
+                double after = Il2CppSystem.Decimal.ToDouble(world.WalletDollars(player));
+                if (Math.Abs(after - want) < 0.5) return;
+                world.DevAddMoney(player, Dec(dollars));
+                after = Il2CppSystem.Decimal.ToDouble(world.WalletDollars(player));
+                Log.Once("earn-check", $"[build] wallet did not change as asked: before ${before:0.##}, wanted ${want:0.##}, now ${after:0.##}");
+            }
             catch (Exception e) { Plugin.Log.LogWarning("[build] payout failed: " + e.Message); }
+        }
+
+        /// <summary>A game Decimal from a number, through its text (the struct constructors are not reliable through interop).</summary>
+        public static Il2CppSystem.Decimal Dec(double v)
+        {
+            long cents = (long)Math.Round(v * 100.0);
+            if (cents % 100 == 0) { Il2CppSystem.Decimal d = (long)(cents / 100); return d; }   // whole dollars: the runtime's own conversion
+            bool neg = cents < 0; ulong m = (ulong)Math.Abs(cents);
+            return new Il2CppSystem.Decimal((int)(m & 0xFFFFFFFF), (int)(m >> 32), 0, neg, 2);
         }
 
         public static double Wallet()

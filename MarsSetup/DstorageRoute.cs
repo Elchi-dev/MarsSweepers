@@ -25,16 +25,22 @@ namespace MarsSetup
         static void UseDstorageRoute()
         {
             if (!WaitForGameClosed()) return;
+            if (ApplyDstorageRoute()) RunAndCollect();
+        }
+
+        /// <summary>Set up the dstorage.dll route (also done by every install). False when it could not be set up.</summary>
+        static bool ApplyDstorageRoute()
+        {
             try
             {
                 if (File.Exists(P("winhttp.dll.off"))) UseWinhttpProxy();
                 string dst = P("dstorage.dll"), orig = P("dstorage_original.dll");
                 if (!File.Exists(orig))
                 {
-                    if (!File.Exists(dst)) { Err("The game's dstorage.dll is missing. Let Steam verify the game files first."); return; }
+                    if (!File.Exists(dst)) { Err("The game's dstorage.dll is missing. Let Steam verify the game files first."); return false; }
                     var names = PeExports(File.ReadAllBytes(dst));
                     var unknown = names.Where(n => !ForwardedExports.Contains(n)).ToList();
-                    if (names.Count == 0 || unknown.Count > 0) { Err("The game's dstorage.dll has functions this route does not forward (" + string.Join(", ", unknown) + "). Not changed."); return; }
+                    if (names.Count == 0 || unknown.Count > 0) { Err("The game's dstorage.dll has functions this route does not forward (" + string.Join(", ", unknown) + "). Not changed."); return false; }
                     File.Move(dst, orig);
                 }
                 using (var s = Res("dstorage-proxy.dll")) using (var f = File.Create(dst)) s.CopyTo(f);
@@ -51,10 +57,10 @@ namespace MarsSetup
                     File.WriteAllText(Path.Combine(DoorstopDir, "doorstop_config.ini"), ini, new UTF8Encoding(false));
                     File.WriteAllText(P("doorstop_config.ini"), ini, new UTF8Encoding(false));
                 }
-                Ok("BepInEx now starts through dstorage.dll (the game's own file is kept as dstorage_original.dll). [16] undoes it.");
+                Ok("BepInEx starts through dstorage.dll (the game's own file is kept as dstorage_original.dll). [16] undoes it.");
+                return true;
             }
-            catch (Exception e) { Err(e.Message); return; }
-            RunAndCollect();
+            catch (Exception e) { Err(e.Message); return false; }
         }
 
         static void UndoDstorageRoute()

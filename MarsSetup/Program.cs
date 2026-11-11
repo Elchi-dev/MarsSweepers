@@ -121,7 +121,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.15  ");
+                                                 |_|   setup v0.9.16  ");
             Console.ResetColor();
         }
 
@@ -533,6 +533,10 @@ namespace MarsSetup
                 Ok("BepInEx installed");
             }
 
+            // ---- Start route: since a Windows change on 2026-11-10 the game may get Windows' own winhttp.dll
+            // (PreferSystem32), so BepInEx also starts through dstorage.dll, which Windows has no copy of.
+            ApplyDstorageRoute();
+
             // ---- Patcher
             if (File.Exists(PatcherPath)) Ok("MoonSweepers BepInEx Patcher is already installed");
             else if (!GetPatcher()) Warn("Continuing without the patcher. No mod (MarsProbe included) loads until it is installed: run me again and pick [1].");
@@ -820,7 +824,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.11: one test round for everything");
+            Head("Mars 0.9.16: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");

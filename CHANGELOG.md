@@ -3,6 +3,16 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.16
+
+### Fixed
+- `money` and every payout (selling, refunds of N-menu buildings) did
+  nothing: MoonWorld.DevAddMoney has no effect in the release game. The team
+  balance is now set with SetTeamDollars and read back; a mismatch is
+  logged once.
+- Every install sets up the dstorage.dll route by itself. Confirmed on the
+  affected PC (2026-11-11 22:50): BepInEx starts through it.
+
 ## 0.9.15
 
 ### Added
