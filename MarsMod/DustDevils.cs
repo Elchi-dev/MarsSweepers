@@ -28,7 +28,7 @@ namespace MarsMod
         {
             Active.Clear();
             if (!MarsWorld.InMarsWorld || home.sqrMagnitude < 1f || Haze.Storm > 0.15f || Haze.Front > 0.05f) return;
-            var terrain = Commands.FindWorld()?.Terrain;
+            var terrain = Commands.World?.Terrain;
             if (terrain == null) return;
             AddForced(terrain);
             double m = Minutes;

@@ -340,6 +340,23 @@ namespace MarsMod
         internal static MoonWalker FindWalker() => Look.All<MoonWalker>().FirstOrDefault(w => Look.InScene(w.gameObject));
         internal static MoonWorld FindWorld() => Look.All<MoonWorld>().FirstOrDefault(w => Look.InScene(w.gameObject));
 
+        static MoonWorld cachedWorld;
+        static float cachedWorldAt = -10f;
+
+        /// <summary>FindWorld for per-frame callers: searching all objects is slow, so the answer is kept for 2 s.</summary>
+        internal static MoonWorld World
+        {
+            get
+            {
+                float now = Time.realtimeSinceStartup;
+                bool alive = false;
+                try { alive = cachedWorld != null && !cachedWorld.WasCollected && cachedWorld.gameObject != null; } catch { }
+                if (alive && now - cachedWorldAt < 2f) return cachedWorld;
+                cachedWorld = FindWorld(); cachedWorldAt = now;
+                return cachedWorld;
+            }
+        }
+
         static void Walker(Action<MoonWalker> act, Action<string> say)
         {
             var w = FindWalker();

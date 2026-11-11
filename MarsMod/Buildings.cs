@@ -393,7 +393,7 @@ namespace MarsMod
                 float now = Time.realtimeSinceStartup;
                 if (now - cleanCheckedAt < 5f) return cleanCached;
                 cleanCheckedAt = now;
-                try { cleanCached = BaseCleanSeconds / Mathf.Clamp(Commands.FindWorld().CleaningWidthMultiplier(Me), 1f, 3f); }
+                try { cleanCached = BaseCleanSeconds / Mathf.Clamp(Commands.World.CleaningWidthMultiplier(Me), 1f, 3f); }
                 catch { cleanCached = BaseCleanSeconds; }
                 return cleanCached;
             }
