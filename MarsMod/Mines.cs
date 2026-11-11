@@ -75,6 +75,7 @@ namespace MarsMod
             // 1. Home mine: on a ring 34-60 m around the main Collector, the flattest reachable spot.
             Home = home;
             DustTiers.Setup(home, seed);
+            DustDevils.Setup(home, seed);
             var rnd = new System.Random(seed);
             {
                 var up = home.normalized;

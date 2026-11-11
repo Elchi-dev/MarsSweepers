@@ -17,7 +17,7 @@ namespace MarsMod
     /// </summary>
     internal static class Wind
     {
-        const int StreakMax = 700, PuffMax = 140, FrontMax = 80;
+        const int StreakMax = 700, PuffMax = 140, FrontMax = 80, DevilParts = 26, DevilMax = DevilParts * 2;
         const float StreakRange = 24f, PuffRange = 70f;
 
         static GameObject root;
@@ -27,9 +27,9 @@ namespace MarsMod
 
         struct P { public Vector3 pos, vel; public float life, maxLife, size, spin, angle, shade, seed; public bool ground, blocked; }
         static readonly P[] streaks = new P[StreakMax];
-        static readonly P[] puffs = new P[PuffMax + FrontMax];
-        static readonly float[] sortKeys = new float[PuffMax + FrontMax];
-        static readonly int[] sortIdx = new int[PuffMax + FrontMax];
+        static readonly P[] puffs = new P[PuffMax + FrontMax + DevilMax];
+        static readonly float[] sortKeys = new float[PuffMax + FrontMax + DevilMax];
+        static readonly int[] sortIdx = new int[PuffMax + FrontMax + DevilMax];
         static readonly System.Random rnd = new System.Random(4217);
         static float gust = 1f, windSpeed, t;
         static int rr, rrp;
@@ -150,9 +150,28 @@ namespace MarsMod
             int frontActive = frontVis > 0.01f ? FrontMax : 0;
 
             int n = 0;
-            for (int i = 0; i < PuffMax + FrontMax; i++)
+            for (int i = 0; i < PuffMax + FrontMax + DevilMax; i++)
             {
                 ref var p = ref puffs[i];
+                if (i >= PuffMax + FrontMax)
+                {
+                    // Dust devils: a spiral of billows, narrow at the ground, wide and thin at the top.
+                    int j = i - PuffMax - FrontMax, k = j / DevilParts, part = j % DevilParts;
+                    if (k >= DustDevils.Active.Count) { p.maxLife = 0f; sortKeys[i] = -1f; continue; }
+                    var dv = DustDevils.Active[k];
+                    float frac = part / (float)(DevilParts - 1);
+                    var de = Vector3.Cross(dv.Up, Vector3.forward); if (de.sqrMagnitude < 1e-4f) de = Vector3.right; de.Normalize();
+                    var dn = Vector3.Cross(dv.Up, de);
+                    float ang = t * (3.2f - frac * 1.6f) + part * 2.39996f;
+                    float radius = 0.7f + frac * frac * 7f;
+                    p.pos = dv.Center + (de * Mathf.Cos(ang) + dn * Mathf.Sin(ang)) * radius + dv.Up * (0.6f + frac * 28f * Mathf.Lerp(0.6f, 1f, dv.Strength));
+                    p.size = 1.4f + frac * 4.5f;
+                    p.angle = ang * 0.5f; p.shade = 0.85f + 0.2f * frac; p.seed = part; p.blocked = false;
+                    p.life = dv.Age; p.maxLife = DustDevils.Life; p.vel = new Vector3(dv.Strength, frac, 0f);
+                    sortKeys[i] = (p.pos - camPos).sqrMagnitude;
+                    n++;
+                    continue;
+                }
                 bool isFront = i >= PuffMax;
                 bool on = isFront ? (i - PuffMax) < frontActive : i < stormActive;
                 if (!on) { p.maxLife = 0f; sortKeys[i] = -1f; continue; }
@@ -193,7 +212,7 @@ namespace MarsMod
                 int v = slot * 4;
                 ref var p = ref puffs[i];
                 if (sortKeys[i] < 0f) { Collapse(pVerts, pCols, v); continue; }
-                bool isFront = i >= PuffMax;
+                bool isFront = i >= PuffMax && i < PuffMax + FrontMax, isDevil = i >= PuffMax + FrontMax;
                 var c = p.pos - camPos;
                 float d = c.magnitude;
                 float size = p.size * (1f + 0.08f * Mathf.Sin(t * 0.7f + p.seed));
@@ -203,7 +222,12 @@ namespace MarsMod
                 pVerts[v] = c - ax - ay; pVerts[v + 1] = c - ax + ay; pVerts[v + 2] = c + ax + ay; pVerts[v + 3] = c + ax - ay;
 
                 float a;
-                if (isFront)
+                if (isDevil)
+                {
+                    float near = Mathf.Clamp01((d - size * 0.4f) / (size * 0.8f));
+                    a = 0.5f * p.vel.x * (1f - p.vel.y * 0.55f) * near * Mathf.Exp(-d / Mathf.Max(250f, L * 2f));
+                }
+                else if (isFront)
                 {
                     float fadeIn = Mathf.Clamp01(p.life / 3f);
                     a = 0.85f * frontVis * fadeIn * Mathf.Exp(-d / Mathf.Max(400f, L * 2f));
@@ -275,7 +299,7 @@ namespace MarsMod
                 root = new GameObject();
                 root.name = "Mars wind";
                 streakMesh = QuadMesh("Mars dust streaks", StreakMax, out sVerts, out sCols, streak: true);
-                puffMesh = QuadMesh("Mars dust billows", PuffMax + FrontMax, out pVerts, out pCols, streak: false);
+                puffMesh = QuadMesh("Mars dust billows", PuffMax + FrontMax + DevilMax, out pVerts, out pCols, streak: false);
                 Renderer(streakMesh, MakeMat(shader, StreakTexture(), "Mars dust streaks"), 10);
                 Renderer(puffMesh, MakeMat(shader, PuffTexture(), "Mars dust billows"), 5);
                 BuildSound();

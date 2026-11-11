@@ -51,6 +51,9 @@ standing outside fill with dust and jam; hold E to scrub them. Roofs, walls
 and shield domes keep the dust out. Light poles clear the air around them so
 you find your way home.
 
+On calm days dust devils wander around the base. They look great and dust
+up the machines they pass a little.
+
 ## Money
 
 Cleaning pays like on the Moon. Far from the Collector the ground gets

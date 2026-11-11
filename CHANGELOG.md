@@ -42,6 +42,10 @@ plugin). Newest first.
   Collector and everyone is told where. It glows, holds hematite and often
   alien alloy; whoever gets there first takes it all. `meteor` drops one
   next to you (host, cheat).
+- Dust devils: on calm days small whirlwinds wander across the plains
+  around the base (the same ones on every PC). One passing over a machine
+  outside dusts it up a little; shields and roofs keep them off. You get a
+  heads-up when one comes within 120 m.
 - The ending: the planet cannon (alien alloy, machine parts, 30 rocket fuel,
   60 kW) fires at the Moon. The game's own ending sequence plays with the
   Moon in the sky. `ending` plays it right away (host, cheat).

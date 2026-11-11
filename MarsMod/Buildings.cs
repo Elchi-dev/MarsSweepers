@@ -403,7 +403,7 @@ namespace MarsMod
         public static bool Jammed(Rec b) => b.Dust >= 1f;
 
         static readonly Dictionary<int, (float until, bool roofed)> roofCache = new Dictionary<int, (float, bool)>();
-        static bool Roofed(Rec b)
+        internal static bool Roofed(Rec b)
         {
             float now = Time.realtimeSinceStartup;
             if (roofCache.TryGetValue(b.Id, out var c) && now < c.until) return c.roofed;
@@ -434,6 +434,7 @@ namespace MarsMod
                     if ((int)(before * 10) != (int)(b.Dust * 10)) dirty = true;
                 }
             }
+            if (DustDevils.DustMachines(Data.List, dt / SpeedCheatSafe())) dirty = true;
             Power.Step(Data.List, dt);
             int hash = 17;
             foreach (var b in Data.List)
