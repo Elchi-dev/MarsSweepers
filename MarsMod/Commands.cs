@@ -30,6 +30,7 @@ namespace MarsMod
             ("build <drill|smelter|container> | buildings", "place a Mars building directly / list all of them"),
             ("mines | tp mine [id]", "list the nearest mines / teleport to one"),
             ("research", "study the game's machines and build menu, render reference pictures (for new Mars machines)"),
+            ("market", "Mars market prices, what moved them, and any boom or crash going on"),
             ("economy", "write the upgrade tree, prices and money numbers to research/economy.txt (works in Moon worlds too)"),
             ("terrain", "check the base site: ground vs. base floors, and whether the valley rim is walkable"),
             ("config", "where this world's settings are saved (every Mars world has its own)"),
@@ -104,6 +105,7 @@ namespace MarsMod
                     break;
                 }
                 case "research": Research.Request(say); break;
+                case "market": foreach (var l in Market.Report()) say(l); break;
                 case "economy": foreach (var l in Economy.Dump()) say(l); break;
                 case "terrain": foreach (var l in TerrainReport()) say(l); break;
                 case "config": say("world settings file: " + MarsProfile.WorldConfigPath); say("PC settings (volume, fog quality): BepInEx/config/marsmod.mars.cfg"); break;

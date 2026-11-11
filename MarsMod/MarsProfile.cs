@@ -82,7 +82,7 @@ namespace MarsMod
         public static ConfigEntry<float> HazeStrength;
         public static ConfigEntry<string> HazeDayColor;
         public static ConfigEntry<float> FogQuality, WindVolume;
-        public static ConfigEntry<bool> WindParticles;
+        public static ConfigEntry<bool> WindParticles, MarketTicker;
 
         /// <summary>Move a setting to its new default if it still holds the old default (so tuning updates reach players).</summary>
         static ConfigEntry<string> Migrate(ConfigEntry<string> e, string oldDefault)
@@ -102,6 +102,7 @@ namespace MarsMod
             FogQuality = cfg.Bind(P, "FogShellSpacing", 1.18f, "Spacing of the fog layers: smaller = smoother fog but slower (1.1 smooth … 1.3 fast).");
             WindParticles = cfg.Bind(P, "WindParticles", true, "Blowing dust, streaks and the storm front.");
             WindVolume = cfg.Bind(P, "WindVolume", 0.7f, "Volume of the wind sound (0 to 1).");
+            MarketTicker = cfg.Bind(P, "MarketTicker", true, "Show the Mars market prices at the top of the screen.");
         }
 
         // ----------------------------------------------------------------- per-world settings
