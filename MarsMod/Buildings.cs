@@ -424,6 +424,7 @@ namespace MarsMod
                 if (def.Role == MarsCatalog.Role.Shield)
                 {
                     bool up = Shields.Wanted && !Jammed(b) && b.Supply >= 0.99f;
+                    if (up) Goals.ShieldRaised();
                     if (up != b.Active) { b.Active = up; dirty = true; Plugin.Log.LogMessage($"[shield] #{b.Id} dome {(up ? "up" : "down")}"); }
                 }
                 hash = hash * 31 + (int)(b.Supply * 20f) + (int)(b.Energy / 5f) * 7 + (b.Burn > 0 ? 3 : 0);

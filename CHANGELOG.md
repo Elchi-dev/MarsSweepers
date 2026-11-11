@@ -34,6 +34,9 @@ plugin). Newest first.
   Moon in the sky. `ending` plays it right away (host, cheat).
 - Blender models and build cards for all new buildings, the ice mine and
   the outpost.
+- Mars contract goals: eight steps from the first drill to the planet
+  cannon, one at a time, each with a cash bonus for the crew ($150 to
+  $2000). `goals` lists them; finishing one tells everyone.
 - Belt research: passive hooks log the first canisters entering machines
   and cargo put on belts, and `belts` shows what the game says about the
   ports of the nearest Mars building. The plan is in docs/BELTS.md.

@@ -37,6 +37,7 @@ namespace MarsMod
             Buildings.Init();
             Market.Init();
             Ending.Init();
+            Goals.Init();
             Guard.Init();
             SafeMode = Guard.StartupCrashed();
             Guard.Begin("startup");

@@ -24,6 +24,7 @@ namespace MarsMod
 
         /// <summary>A Mars world is being played right now.</summary>
         public static bool InMarsWorld => marsWorld;
+        static bool goalsShown;
         /// <summary>A Mars world is loading (loading screen up).</summary>
         public static bool LoadingMars { get; private set; }
         /// <summary>The player has landed and can see the HUD (messages wait for this).</summary>
@@ -98,7 +99,7 @@ namespace MarsMod
             // Every frame while on Mars: buildings, the build menu, and the haze following the camera.
             if (marsWorld)
             {
-                try { VanillaBuild.PlacementFrame(); Buildings.Tick(now, dt); Market.Tick(now); LightPoles.Tick(); Shields.Frame(dt); Ending.Frame(); Ending.After(); if (Camera.main != null) DustTiers.Frame(Camera.main.transform.position); BuildMode.Frame(now, dt); }
+                try { VanillaBuild.PlacementFrame(); Buildings.Tick(now, dt); Goals.Tick(now); Market.Tick(now); LightPoles.Tick(); Shields.Frame(dt); Ending.Frame(); Ending.After(); if (Camera.main != null) DustTiers.Frame(Camera.main.transform.position); BuildMode.Frame(now, dt); }
                 catch (Exception e) { Log.Once("build-frame", "Mars buildings: " + e); }
                 try
                 {
@@ -221,6 +222,7 @@ namespace MarsMod
             else if (walkerSince < 0f && grounded) walkerSince = now;
             PlayerReady = walkerSince >= 0f && now - walkerSince > 4f;
             if (PlayerReady) Greet();
+            if (PlayerReady && !goalsShown && MarsData.Loaded) { goalsShown = true; Goals.Opened(); }
             if (PlayerReady) { try { Mines.Ensure(); } catch (Exception e) { Log.Once("mines", "Mines: " + e.Message); } }
             if (PlayerReady && !Log.Seen("terrain-check"))
             {
@@ -265,6 +267,7 @@ namespace MarsMod
             Shields.Clear();
             DustTiers.Reset();
             Ending.Reset();
+            Goals.Reset(); goalsShown = false;
             VanillaBuild.Reset();
             Market.Reset();
             Mines.Clear();

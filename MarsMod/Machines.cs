@@ -29,7 +29,7 @@ namespace MarsMod
                     var mine = Mines.ById(b.Mine);
                     if (mine == null || Buildings.Total(b.Items) >= def.Cap) break;
                     b.Progress += dt * slow / def.Seconds;
-                    while (b.Progress >= 1f && Buildings.Total(b.Items) < def.Cap) { b.Progress -= 1f; Buildings.AddTo(b.Items, mine.Ore, 1); changed = true; }
+                    while (b.Progress >= 1f && Buildings.Total(b.Items) < def.Cap) { b.Progress -= 1f; Buildings.AddTo(b.Items, mine.Ore, 1); Goals.Produced(mine.Ore, 1); changed = true; }
                     if (Buildings.Total(b.Items) >= def.Cap) b.Progress = 0f;
                     break;
                 }
@@ -43,7 +43,7 @@ namespace MarsMod
                     {
                         b.Progress = 0f;
                         foreach (var kv in def.In) Buildings.AddTo(b.Items, kv.Key, -kv.Value);
-                        foreach (var kv in def.Out) Buildings.AddTo(b.Items, kv.Key, kv.Value);
+                        foreach (var kv in def.Out) { Buildings.AddTo(b.Items, kv.Key, kv.Value); Goals.Produced(kv.Key, kv.Value); }
                         changed = true;
                     }
                     break;
@@ -159,6 +159,7 @@ namespace MarsMod
                         if (b.Supply < 0.99f) return $"The cannon needs its full {def.PowerUse:0} kW (the grid gives {b.Supply * 100f:0}%). Build more power.";
                         Buildings.AddTo(b.Items, "rocket_fuel", -def.Cap);
                         Ending.Fire();
+                        Goals.CannonFired();
                         return null;
                     }
                     int n = Math.Min(def.Cap - fuel, Buildings.Count(pack, "rocket_fuel"));

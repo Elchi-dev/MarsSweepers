@@ -27,6 +27,7 @@ namespace MarsMod
             ("money [amount]", "CHEAT: add money (default $10,000)"),
             ("unlock", "CHEAT: buy every upgrade in the upgrade tree for free"),
             ("give <item> [count]", "CHEAT: put Mars items in your backpack (give alone lists them)"),
+            ("goals", "the Mars contract goals and the bonus for each"),
             ("power", "every power grid: what it makes, uses and stores"),
             ("belts", "research: belts near you and what the game says about the nearest Mars building's ports"),
             ("ending", "CHEAT (host): play the Mars ending now, the Moon in the sky gets it"),
@@ -104,6 +105,7 @@ namespace MarsMod
                     break;
                 case "ending": if (!MarsNet.IsHost) { say("Only the host can start the ending."); break; } Ending.Fire(); say("Ending in " + Ending.Countdown + " s (cheat: no cannon needed)."); break;
                 case "belts": { var w0 = FindWalker(); foreach (var l in BeltResearch.Report(w0 != null ? w0.transform.position : Vector3.zero)) say(l); break; }
+                case "goals": foreach (var l in Goals.Report()) say(l); say(Goals.Current()); break;
                 case "power": foreach (var l in Power.Report()) say(l); break;
                 case "mines":
                 {

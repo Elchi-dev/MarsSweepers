@@ -98,6 +98,7 @@ namespace MarsMod
             }
             foreach (var kv in o.Get) Buildings.AddTo(pack, kv.Key, kv.Value);
             if (o.PayDollars > 0) Buildings.Earn(world, player, o.PayDollars);
+            Goals.Traded();
             Plugin.Log.LogMessage($"[aliens] {player} traded {Text(o)}");
             return "Traded: " + Text(o) + ". The aliens hum happily.";
         }

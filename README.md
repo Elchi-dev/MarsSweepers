@@ -83,6 +83,7 @@ Everything follows from that:
 | **Shields** | A shield generator raises a dome when a storm comes; the covered ground is found by flood fill |
 | **Dust tiers** | Sectors pay x1 to x4 of the normal bounty, more the further you go |
 | **Aliens** | Three trader outposts per world, alien alloy for what the crew makes |
+| **Goals** | Eight contract goals from the first drill to the cannon, each with a crew bonus |
 | **The ending** | The planet cannon fires at the Moon, with the game's own ending sequence |
 | **Storage** | A Mars backpack per player and crew storage that can be sold |
 | **Market** | Prices that move, booms and crashes, a ticker; selling a lot lowers your price |
