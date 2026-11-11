@@ -152,6 +152,9 @@ second player with machines, Linux under Wine or Proton.
 
 | Document | What |
 | --- | --- |
+| [docs/PLAYING.md](docs/PLAYING.md) | For players: install, the first hour, storms, money, keys |
+| [docs/BALANCE.md](docs/BALANCE.md) | Where the Mars prices and rates come from |
+| [docs/BELTS.md](docs/BELTS.md) | What is known about the game's belts and the plan for Mars items on them |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | The parts, the frame loop, every file, what lands on disk |
 | [docs/HOOKS.md](docs/HOOKS.md) | Every game method the mod patches and why, and the rules for hooks |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Why game building kinds, why a save side file, why string ids |

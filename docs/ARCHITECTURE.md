@@ -5,7 +5,7 @@ Three programs live here:
 | Part | What it is |
 | --- | --- |
 | `MarsMod/` | The mod, a BepInEx 6 IL2CPP plugin (`MarsMod.dll`) |
-| `MarsSetup/` | The installer, one Windows `.exe` (.NET Framework 4.8) that carries BepInEx, the mod, MarsProbe and the narrator lines |
+| `MarsSetup/` | The installer, one Windows `.exe` (.NET Framework 4.8) that carries BepInEx, the mod, MarsProbe and the narrator lines. A window for players (`Installer.cs`), the tester menu with `--dev` |
 | `MarsProbe/` | A research plugin: dumps the game's types, scenes and definitions, traces calls, writes a report the installer zips up |
 
 `models/` holds the Blender scripts the machine models are made from;
@@ -56,8 +56,16 @@ A Moon world never runs the Mars parts: every feature checks
 | `MarsData.cs` | Per-world Mars data: sections, atomic save, host to crew sync |
 | `Gltf.cs`, `Models.cs` | glTF reader, game objects from models, materials, colliders, moving parts |
 | `Mines.cs` | Home mine and seeded mines |
-| `MarsItems.cs` | Items and the building catalogue |
+| `MarsItems.cs` | Items and the building catalogue (prices, recipes, power, item costs) |
 | `Buildings.cs` | Machine state, production, backpacks, crew storage, requests to the host |
+| `Machines.cs` | What every building role does: production, using it, its prompt, the logistics hub |
+| `Power.cs` | Power grids: solar, batteries, generators, supply per building |
+| `Shields.cs` | Shield coverage (flood fill), the dome and the covered-ground tiles |
+| `DustTiers.cs` | Sector tiers: bounty bonus and slower scrubbing |
+| `Aliens.cs` | Alien trader outposts and their offers |
+| `Goals.cs` | The contract goals and their bonuses |
+| `Ending.cs` | The planet cannon's countdown and the game's ending sequence |
+| `BeltResearch.cs` | Passive belt hooks and the `belts` report |
 | `VanillaBuild.cs` | Mars machines as game building kinds, cards, placement rules, the save side file |
 | `BuildMode.cs` | Using machines (E, hold to scrub), the HUD, and the fallback N menu |
 | `Market.cs` | Moving prices, booms and crashes, selling pressure, the ticker |
