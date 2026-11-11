@@ -104,7 +104,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.3   ");
+                                                 |_|   setup v0.9.4   ");
             Console.ResetColor();
         }
 
@@ -268,7 +268,61 @@ namespace MarsSetup
             bool interop = Directory.Exists(P("BepInEx", "interop")) && Directory.GetFiles(P("BepInEx", "interop"), "Assembly-CSharp.dll").Length > 0;
             Line("Interop files (made on first start)", interop ? "generated" : "not yet", interop);
             Line("MarsProbe report", Directory.Exists(P("MarsProbe", "Report")) ? "exists" : "none yet", Directory.Exists(P("MarsProbe", "Report")));
+            foreach (var w in LoaderProblems()) Warn(w);
             if (GameRunning()) Warn("Moon Sweepers is running right now.");
+        }
+
+        /// <summary>Things that stop BepInEx from starting at all (no console window, no mods).</summary>
+        static IEnumerable<string> LoaderProblems()
+        {
+            var list = new List<string>();
+            try
+            {
+                if (!File.Exists(P("winhttp.dll"))) list.Add("winhttp.dll is missing from the game folder: BepInEx cannot start. Pick [1].");
+                string ini = P("doorstop_config.ini");
+                if (File.Exists(ini) && Regex.IsMatch(File.ReadAllText(ini), @"(?im)^\s*enabled\s*=\s*false")) list.Add("doorstop_config.ini has 'enabled = false': BepInEx is switched off. Pick [1] to switch it on again.");
+                if (!File.Exists(P("dotnet", "coreclr.dll"))) list.Add("dotnet\\coreclr.dll is missing: BepInEx cannot start. Pick [1].");
+                foreach (var proxy in new[] { "version.dll", "winmm.dll", "dinput8.dll", "dxgi.dll", "d3d11.dll" })
+                    if (File.Exists(P(proxy))) list.Add($"{proxy} in the game folder: another mod loader may be hooked in there and can stop BepInEx.");
+                string opts = LaunchOptions();
+                if (!string.IsNullOrWhiteSpace(opts))
+                {
+                    if (opts.IndexOf("doorstop", StringComparison.OrdinalIgnoreCase) >= 0)
+                        list.Add($"Steam launch options switch BepInEx off: \"{opts}\". Remove them: Steam, Moon Sweepers, Properties, General, Launch options.");
+                    else list.Add($"Steam launch options are set: \"{opts}\" (fine unless they start something else).");
+                }
+            }
+            catch { }
+            return list;
+        }
+
+        /// <summary>The game's launch options in Steam (every Steam user on this PC).</summary>
+        static string LaunchOptions()
+        {
+            var found = new List<string>();
+            foreach (var root in SteamLibraries().Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                string ud = Path.Combine(root, "userdata");
+                if (!Directory.Exists(ud)) continue;
+                foreach (var cfg in Directory.GetFiles(ud, "localconfig.vdf", SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        string t = File.ReadAllText(cfg);
+                        int i = t.IndexOf("\"" + SteamAppId + "\"", StringComparison.Ordinal);
+                        while (i >= 0)
+                        {
+                            string chunk = t.Substring(i, Math.Min(4000, t.Length - i));
+                            int close = chunk.IndexOf("\n\t\t\t\t}", StringComparison.Ordinal);
+                            var m = Regex.Match(close > 0 ? chunk.Substring(0, close) : chunk, "\"LaunchOptions\"\\s+\"([^\"]*)\"");
+                            if (m.Success && m.Groups[1].Value.Trim().Length > 0) found.Add(m.Groups[1].Value);
+                            i = t.IndexOf("\"" + SteamAppId + "\"", i + 1, StringComparison.Ordinal);
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return string.Join(" | ", found.Distinct());
         }
 
         static void Line(string what, string state, bool good)
@@ -361,7 +415,18 @@ namespace MarsSetup
             bool haveBep = File.Exists(BepCore);
             if (haveBep && SameAsEmbedded("BepInEx/core/BepInEx.Unity.IL2CPP.dll", BepCore))
             {
-                Ok("BepInEx 6.0.0-be.791 is already installed");
+                // Same build: still put back its loader files (winhttp.dll, doorstop_config.ini, dotnet/, core/),
+                // in case something changed or disabled them. Settings, plugins and interop files stay.
+                using (var z = new ZipArchive(Res("BepInEx.zip"), ZipArchiveMode.Read))
+                    foreach (var e in z.Entries)
+                    {
+                        string n = e.FullName.Replace('\\', '/');
+                        if (n.EndsWith("/") || n.StartsWith("BepInEx/config/")) continue;
+                        string dst = Path.Combine(game, n.Replace('/', Path.DirectorySeparatorChar));
+                        try { Directory.CreateDirectory(Path.GetDirectoryName(dst)); e.ExtractToFile(dst, true); }
+                        catch (Exception ex) { Warn("Could not refresh " + n + ": " + ex.Message); }
+                    }
+                Ok("BepInEx 6.0.0-be.791 is installed (loader files refreshed)");
             }
             else
             {
@@ -666,7 +731,9 @@ namespace MarsSetup
             }
 
             Console.WriteLine();
-            Head("Mars 0.9.1: one test round for everything");
+            Head("Mars 0.9.4: one test round for everything");
+            Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
+            Info("   quit, run me again and send me the report (option 3) so I can see why.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
             Info("  1. Load it and play normally for 2 to 3 minutes, ideally near running belts. After a minute the");
             Info("     mod writes its research files by itself; typing 'collect' (Ctrl+Shift+K) does it again.");
@@ -742,6 +809,10 @@ namespace MarsSetup
                 sb.AppendLine("MarsSetup report " + DateTime.Now);
                 sb.AppendLine("Game folder: " + game);
                 sb.AppendLine("Windows: " + Environment.OSVersion + (Environment.Is64BitOperatingSystem ? " x64" : ""));
+                sb.AppendLine("Steam launch options: " + LaunchOptions());
+                foreach (var w in LoaderProblems()) sb.AppendLine("Loader check: " + w);
+                try { sb.AppendLine("doorstop_config.ini:"); sb.AppendLine(File.ReadAllText(P("doorstop_config.ini"))); } catch { }
+                try { sb.AppendLine("dotnet files: " + Directory.GetFiles(P("dotnet")).Length); } catch { }
                 foreach (var lib in SteamLibraries())
                 {
                     string man = Path.Combine(lib, "steamapps", "appmanifest_" + SteamAppId + ".acf");
