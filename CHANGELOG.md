@@ -3,6 +3,19 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.11
+
+### Added
+- Setup option [12]: start MoonSweepers.exe directly instead of through
+  Steam (with steam_appid.txt so the game does not hand the start back),
+  to tell whether the way Steam starts the game keeps BepInEx out.
+- Diagnosis: Steam's version, file dates and update log; the image load
+  policy of each game process as soon as it is seen.
+
+### Changed
+- Compatibility settings were not the cause on the affected PC: the
+  2026-11-11 22:11 report found none.
+
 ## 0.9.10
 
 ### Fixed

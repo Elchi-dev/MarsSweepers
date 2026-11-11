@@ -32,6 +32,7 @@ namespace MarsSetup
                 lock (Lines) Lines.Clear();
                 L("checked " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                 Files();
+                SteamFacts();
                 foreach (var c in CompatFindings()) L("windows setting: " + c);
                 if (CompatFindings().Count == 0) L("no compatibility layer, no compatibility assistant record and no image options for the game exe");
                 WindowsFacts();
@@ -140,6 +141,30 @@ namespace MarsSetup
                 catch (Exception e) { L("update events unreadable: " + e.Message); }
             }
 
+            /// <summary>Steam's own version and its update history: Steam starts the game, so a Steam update can change how.</summary>
+            static void SteamFacts()
+            {
+                try
+                {
+                    string root = SteamLibraries().FirstOrDefault(r => File.Exists(Path.Combine(r, "steam.exe")));
+                    if (root == null) { L("Steam folder not found"); return; }
+                    var exe = new FileInfo(Path.Combine(root, "steam.exe"));
+                    L($"steam.exe {FileVersionInfo.GetVersionInfo(exe.FullName).FileVersion}, changed {exe.LastWriteTime:yyyy-MM-dd HH:mm}");
+                    foreach (var dll in new[] { "steamclient64.dll", "gameoverlayrenderer64.dll", "GameOverlayUI.exe" })
+                    {
+                        var f = new FileInfo(Path.Combine(root, dll));
+                        if (f.Exists) L($"steam {dll}: changed {f.LastWriteTime:yyyy-MM-dd HH:mm}, {f.Length} bytes");
+                    }
+                    var manifest = Path.Combine(root, "package", "steam_client_win64.manifest");
+                    if (File.Exists(manifest)) L($"steam client manifest: changed {File.GetLastWriteTime(manifest):yyyy-MM-dd HH:mm}, {File.ReadLines(manifest).Take(3).Aggregate((a, b) => a + " " + b).Replace("\t", " ")}");
+                    var boot = Path.Combine(root, "logs", "bootstrap_log.txt");
+                    if (File.Exists(boot))
+                        foreach (var line in File.ReadAllLines(boot).Where(l => l.IndexOf("update", StringComparison.OrdinalIgnoreCase) >= 0 || l.IndexOf("version", StringComparison.OrdinalIgnoreCase) >= 0).Reverse().Take(15).Reverse())
+                            L("steam bootstrap: " + line);
+                }
+                catch (Exception e) { L("steam facts failed: " + e.Message); }
+            }
+
             static bool HasMotw(string path)
             {
                 try { return File.Exists(path + ":Zone.Identifier"); } catch { return false; }
@@ -213,11 +238,12 @@ namespace MarsSetup
                     foreach (var p in Process.GetProcessesByName(exe))
                     {
                         if (!seenPids.Add(p.Id)) continue;
+                        L($"game process {p.Id} image load policy at first sight: {ImageLoadPolicy(p)}");
                         L($"game process {p.Id} started {Safe(() => p.StartTime.ToString("HH:mm:ss"))}, command line: {CommandLine(p.Id)}, parent: {Parent(p.Id)}");
                         int pid = p.Id;
                         new Thread(() => Modules(pid)) { IsBackground = true }.Start();
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
                 L($"{seenPids.Count} game process(es) seen in the first 90 s");
             }

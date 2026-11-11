@@ -63,6 +63,7 @@ namespace MarsSetup
                     Console.WriteLine("  [9] Check why mods do not load (also runs by itself on every game start)");
                     Console.WriteLine("  [10] Start BepInEx through version.dll instead of winhttp.dll (when the game loads Windows' own winhttp.dll)");
                     Console.WriteLine("  [11] Back to winhttp.dll (BepInEx's normal way)");
+                    Console.WriteLine("  [12] Start the game directly, not through Steam (tells whether Steam's way of starting it is the problem)");
                     Console.WriteLine("  [0] Exit");
                     Console.Write("> ");
                     string c = (Console.ReadLine() ?? "").Trim();
@@ -87,6 +88,7 @@ namespace MarsSetup
                         case "9": Diagnose.Static(); foreach (var l in Diagnose.Lines) Info(l); break;
                         case "10": UseVersionProxy(); break;
                         case "11": UseWinhttpProxy(); break;
+                        case "12": StartDirect(); break;
                         case "0": case "": return 0;
                     }
                 }
@@ -111,7 +113,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.10  ");
+                                                 |_|   setup v0.9.11  ");
             Console.ResetColor();
         }
 
@@ -387,6 +389,36 @@ namespace MarsSetup
             }
             catch (Exception e) { Err(e.Message); }
         }
+
+        /// <summary>
+        /// Starts MoonSweepers.exe ourselves instead of through Steam. A steam_appid.txt next to it (Valve's documented
+        /// way) keeps the game from handing the start back to Steam. Steam must be running and signed in.
+        /// If BepInEx starts this way and not through Steam, the difference is how Steam starts the game.
+        /// </summary>
+        static void StartDirect()
+        {
+            if (!WaitForGameClosed()) return;
+            if (File.Exists(P("winhttp.dll.off"))) UseWinhttpProxy();
+            try
+            {
+                string appid = P("steam_appid.txt");
+                if (!File.Exists(appid)) File.WriteAllText(appid, SteamAppId + "\n");
+                Info("Starting MoonSweepers.exe directly…");
+                Process.Start(new ProcessStartInfo(P(GameExe)) { WorkingDirectory = game, UseShellExecute = false });
+                Diagnose.Watch();
+                Info("Watch for the black BepInEx console window. Close the game when you know, I'll build the report.");
+                while (!GameRunning()) Thread.Sleep(300);
+                while (GameRunning()) Thread.Sleep(1000);
+                Head("What the game loaded");
+                foreach (var l in Diagnose.Lines.ToList().Where(x => x.Contains("process")))
+                    if (!IsWindowsModuleLine(l)) Info(l);
+                Thread.Sleep(1500);
+                Collect();
+            }
+            catch (Exception e) { Err(e.Message); }
+        }
+
+        static bool IsWindowsModuleLine(string l) => l.Contains(" module ") && l.Contains(": windows: ");
 
         static void UseWinhttpProxy()
         {
@@ -780,7 +812,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.10: one test round for everything");
+            Head("Mars 0.9.11: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
