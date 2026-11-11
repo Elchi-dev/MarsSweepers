@@ -78,7 +78,7 @@ Everything follows from that:
 | **The air** | A sky dome and fog shells, haze per world, Phobos, morning start |
 | **Dust storms** | A schedule per world seed, a 75 second warning with a front you can see, wind, sound and an alarm. Walls and roofs keep them out |
 | **Mines** | A home mine next to the base and 36 more from the seed, water ice near the poles. They never run out |
-| **Machines** | Ore drill, smelter, crusher, fiber spinner, assembler, electrolyzer, fuel refinery, container port, market board, in the game's build menu with their own cards, made in Blender in the game's style |
+| **Machines** | Ore drill, smelter, crusher, fiber spinner, assembler, electrolyzer, fuel refinery, container port, logistics hub, market board, in the game's build menu with their own cards, made in Blender in the game's style |
 | **Power** | Solar panels (weak in storms), batteries, fuel generators, light poles that carry power; grids form by themselves |
 | **Shields** | A shield generator raises a dome when a storm comes; the covered ground is found by flood fill |
 | **Dust tiers** | Sectors pay x1 to x4 of the normal bounty, more the further you go |

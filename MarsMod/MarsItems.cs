@@ -45,7 +45,7 @@ namespace MarsMod
 
     internal static class MarsCatalog
     {
-        public enum Role { Extractor, Recipe, Storage, Light, Solar, Battery, Generator, Shield, Market, Cannon, Trader }
+        public enum Role { Extractor, Recipe, Storage, Light, Solar, Battery, Generator, Shield, Market, Cannon, Trader, Hub }
 
         public sealed class Def
         {
@@ -61,6 +61,7 @@ namespace MarsMod
             public float PowerUse, PowerMake;          // kW
             public float Battery;                      // kW·min a battery holds
             public bool Jams;                          // storm dust builds up on it when it stands outside
+            public float Radius2;                      // working range (logistics hub)
         }
 
         static Dictionary<string, int> D(params (string, int)[] kv) => kv.ToDictionary(x => x.Item1, x => x.Item2);
@@ -95,6 +96,9 @@ namespace MarsMod
                       Info = "The crew storage: deposit your backpack, sell everything at the market price." },
             new Def { Id = "market", Name = "Market board", Model = "market", Role = Role.Market, Price = 200, Radius = 1.6f, Category = "Logistics",
                       Info = "Shows every Mars price and where it is heading. Sells from the crew storage, one material at a time." },
+            new Def { Id = "hub", Name = "Logistics hub", Model = "hub", Role = Role.Hub, Price = 900, Radius = 2.0f, Category = "Logistics",
+                      ItemCost = D(("iron_plate", 20)), Radius2 = 30f, PowerUse = 4f, Jams = true,
+                      Info = "Its drones empty every Mars machine within 30 m into the crew storage and refill their inputs from it, every 5 s. Needs 4 kW. Costs 20 iron plates too." },
             new Def { Id = "lightpole", Name = "Light pole", Model = "lightpole", Role = Role.Light, Price = 60, Radius = 0.8f, Category = "Power",
                       Info = "A lamp that clears the storm air around it (about 20 m), and carries power 25 m to the next building or pole." },
             new Def { Id = "solar", Name = "Mars solar panel", Model = "solar", Role = Role.Solar, Price = 150, Radius = 2.0f, Category = "Power",

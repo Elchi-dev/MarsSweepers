@@ -76,6 +76,8 @@ namespace MarsMod
             return b;
         }
 
+        public static void StockChanged() => stockDirty = true;
+
         public static int Count(Dictionary<string, int> inv, string item) => inv != null && inv.TryGetValue(item, out var n) ? n : 0;
         public static void AddTo(Dictionary<string, int> inv, string item, int n) { inv[item] = Count(inv, item) + n; if (inv[item] <= 0) inv.Remove(item); }
         public static int Total(Dictionary<string, int> inv) => inv?.Values.Sum() ?? 0;

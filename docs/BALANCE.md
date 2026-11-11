@@ -46,6 +46,7 @@ is the point where Mars overtakes the Moon.
 | Battery ($200) | 120 kW·min | |
 | Fuel generator ($600 + 4 parts) | 30 kW, 1 rocket fuel a minute (12 $/min) | |
 | Drill / crusher / spinner | | 3 / 4 / 3 kW |
+| Logistics hub ($900 + 20 plates) | | 4 kW |
 | Smelter / assembler / refinery | | 6 kW each |
 | Electrolyzer | | 12 kW |
 | Shield ($2500 + 20 parts + 10 fiber) | | 30 kW, only while a storm is near |

@@ -21,6 +21,9 @@ plugin). Newest first.
   basalt fiber), assembler (iron plates and fiber to machine parts).
 - Water ice mines near the poles, electrolyzer (ice to oxygen and hydrogen)
   and fuel refinery (hydrogen and oxygen to rocket fuel).
+- Logistics hub: its drones empty every Mars machine within 30 m into the
+  crew storage and refill their inputs from it every 5 s (4 kW). Until Mars
+  items ride on belts, this is how a base runs by itself.
 - Market board: every Mars price and where it is heading; sells from the
   crew storage, the best-paying material first or everything at once.
 - Item costs: the later machines also take materials from the crew storage

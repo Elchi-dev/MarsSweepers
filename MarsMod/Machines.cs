@@ -48,8 +48,55 @@ namespace MarsMod
                     }
                     break;
                 }
+                case Role.Hub:
+                {
+                    b.Progress += dt * power / 5f;
+                    if (b.Progress < 1f) break;
+                    b.Progress = 0f;
+                    if (Haul(b, def)) changed = true;
+                    break;
+                }
             }
             return changed;
+        }
+
+        /// <summary>The logistics hub's round: outputs of every Mars machine in range to the crew storage, inputs back.</summary>
+        static bool Haul(Buildings.Rec hub, Def def)
+        {
+            var store = Buildings.Items.Storage;
+            int moved = 0;
+            foreach (var r in Buildings.Data.List)
+            {
+                if (r == hub || r.Owner == Aliens.Owner || (r.Pos - hub.Pos).sqrMagnitude > def.Radius2 * def.Radius2) continue;
+                var d = Get(r.Type);
+                if (d == null || Buildings.Jammed(r)) continue;
+                switch (d.Role)
+                {
+                    case Role.Extractor:
+                        foreach (var kv in r.Items.ToList()) { Buildings.AddTo(store, kv.Key, kv.Value); moved += kv.Value; }
+                        r.Items.Clear();
+                        break;
+                    case Role.Recipe:
+                    case Role.Generator:
+                        foreach (var kv in d.Out)
+                        {
+                            int n = Buildings.Count(r.Items, kv.Key);
+                            if (n <= 0) continue;
+                            Buildings.AddTo(r.Items, kv.Key, -n); Buildings.AddTo(store, kv.Key, n); moved += n;
+                        }
+                        foreach (var kv in d.In)
+                        {
+                            int want = Math.Min(d.Cap, d.Role == Role.Generator ? 5 : kv.Value * 5);
+                            int n = Math.Min(want - Buildings.Count(r.Items, kv.Key), Buildings.Count(store, kv.Key));
+                            if (n <= 0) continue;
+                            Buildings.AddTo(store, kv.Key, -n); Buildings.AddTo(r.Items, kv.Key, n); moved += n;
+                        }
+                        break;
+                }
+            }
+            if (moved > 0) Buildings.StockChanged();
+            hub.Burn = moved;          // shown in the prompt: items moved in the last round
+            return moved > 0;
         }
 
         /// <summary>Is this machine doing work right now (for its moving parts and the grid's demand).</summary>
@@ -63,7 +110,8 @@ namespace MarsMod
                     return def.In.All(kv => Buildings.Count(b.Items, kv.Key) >= kv.Value) &&
                            def.Out.All(kv => Buildings.Count(b.Items, kv.Key) + kv.Value <= def.Cap);
                 case Role.Shield: return Shields.Wanted;
-                case Role.Cannon: return Buildings.Count(b.Items, "rocket_fuel") >= def.Cap;   // charging draws power once it is loaded
+                case Role.Cannon: return Buildings.Count(b.Items, "rocket_fuel") >= def.Cap;
+                case Role.Hub: return true;   // charging draws power once it is loaded
             }
             return false;
         }
@@ -208,6 +256,12 @@ namespace MarsMod
                 case Role.Generator:
                     return $"{name}  ·  fuel {Buildings.Count(b.Items, "rocket_fuel")}/{def.Cap}" + (b.Burn > 0 ? $"  ·  running ({b.Burn:0} s of fuel left)" : "  ·  idle") + power;
                 case Role.Trader: return Aliens.Describe(b, def);
+                case Role.Hub:
+                {
+                    int n = Buildings.Data.List.Count(r => r != b && r.Owner != Aliens.Owner && (r.Pos - b.Pos).sqrMagnitude <= def.Radius2 * def.Radius2 &&
+                                                          Get(r.Type) is Def d2 && (d2.Role == Role.Extractor || d2.Role == Role.Recipe || d2.Role == Role.Generator));
+                    return $"{name}  ·  serves {n} machine{(n == 1 ? "" : "s")} within {def.Radius2:0} m  ·  last round moved {b.Burn:0}" + power;
+                }
                 case Role.Cannon:
                     return $"{name}  ·  rocket fuel {Buildings.Count(b.Items, "rocket_fuel")}/{def.Cap}" + power;
                 case Role.Shield:
