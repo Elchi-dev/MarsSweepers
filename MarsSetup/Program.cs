@@ -104,7 +104,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.2   ");
+                                                 |_|   setup v0.9.3   ");
             Console.ResetColor();
         }
 
@@ -670,7 +670,8 @@ namespace MarsSetup
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
             Info("  1. Load it and play normally for 2 to 3 minutes, ideally near running belts. After a minute the");
             Info("     mod writes its research files by itself; typing 'collect' (Ctrl+Shift+K) does it again.");
-            Info(" Then MARS (quit to the menu, load your Mars world):");
+            Info(" Then MARS: quit to the menu, pick an empty slot, Play, answer Mars (or load your Mars slot).");
+            Info("  No question? Terminal in the menu: 'mars slot 0' makes empty slot 0 a Mars slot.");
             Info("  2. 'money', then with the build tool: Ore drill ON a mine, Smelter, Container port, Light pole.");
             Info("  3. E on the machines, Shift+E on the container. 'storm now': machines outside jam, hold E to scrub.");
             Info("     Stand by the light pole in the storm. Watch the market ticker at the top.");
@@ -718,6 +719,8 @@ namespace MarsSetup
 
                 AddDir(P("MarsProbe"), "MarsProbe");
                 Add(P("BepInEx", "LogOutput.log"), "BepInEx/LogOutput.log");
+                foreach (var extra in Directory.Exists(P("BepInEx")) ? Directory.GetFiles(P("BepInEx"), "LogOutput*.log") : new string[0])
+                    if (Path.GetFileName(extra) != "LogOutput.log") Add(extra, "BepInEx/" + Path.GetFileName(extra));
                 Add(P("BepInEx", "ErrorLog.log"), "BepInEx/ErrorLog.log");
                 AddDir(P("BepInEx", "config"), "BepInEx/config");
                 AddDir(P("BepInEx", "MarsMod"), "BepInEx/MarsMod", f => !f.EndsWith(".wav", StringComparison.OrdinalIgnoreCase));
