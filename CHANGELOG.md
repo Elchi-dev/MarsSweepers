@@ -3,6 +3,16 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.1
+
+### Added
+- `collect`: writes everything the next features are built from in one go:
+  the economy dump, a deep dump of the world's belts, belt queues, machine
+  inputs and outputs, production, cargo and power grids, and a MarsProbe
+  snapshot. It also runs by itself once per world, a minute after loading.
+- `deep [fields]`: the deep dump alone, optionally with more world fields.
+- MarsProbe's tracer also counts belt, machine, cargo and power methods.
+
 ## 0.9.0
 
 ### Added

@@ -101,7 +101,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.0   ");
+                                                 |_|   setup v0.9.1   ");
             Console.ResetColor();
         }
 
@@ -650,16 +650,16 @@ namespace MarsSetup
             }
 
             Console.WriteLine();
-            Head("Mars 0.9 test");
-            Info(" 1. Load your Mars world. Terminal (Ctrl+Shift+K): 'money' gives $10,000, 'tp mine' finds a mine.");
-            Info(" 2. Build tool (hammer), build menu: Ore drill and Smelter (Production), Container port (Logistics),");
-            Info("    Light pole (Services). The drill goes ON a mine. E uses a machine, Shift+E the second action.");
-            Info(" 3. 'storm now': machines standing outside fill up with dust and jam. Hold E on one to scrub it.");
-            Info("    Stand next to a light pole in the storm: the air clears up around it. At night its lamp is on.");
-            Info(" 4. The market ticker at the top: prices move every 20 s, sometimes a boom or a crash. 'market'");
-            Info("    shows more. The container port's Shift+E sells at the market price; sell a lot and it drops.");
-            Info(" 5. Save, quit, load again: machines still there? A Moon world: no Mars cards. Play it together!");
-            Info(" 6. For balancing later: in a MOON world type 'economy' once. Then quit, I'll build the report.");
+            Head("Mars 0.9.1: one test round for everything");
+            Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
+            Info("  1. Load it and play normally for 2 to 3 minutes, ideally near running belts. After a minute the");
+            Info("     mod writes its research files by itself; typing 'collect' (Ctrl+Shift+K) does it again.");
+            Info(" Then MARS (quit to the menu, load your Mars world):");
+            Info("  2. 'money', then with the build tool: Ore drill ON a mine, Smelter, Container port, Light pole.");
+            Info("  3. E on the machines, Shift+E on the container. 'storm now': machines outside jam, hold E to scrub.");
+            Info("     Stand by the light pole in the storm. Watch the market ticker at the top.");
+            Info("  4. Save, quit to the menu, load Mars again: machines still there? Type 'collect' once more.");
+            Info("  5. Quit the game. I'll build the report. Screenshots of anything odd help a lot.");
             Info("Screenshots are very welcome, especially of the intro, the sky and a storm!");
             Console.WriteLine();
             var start = DateTime.Now;
