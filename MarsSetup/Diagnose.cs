@@ -32,6 +32,7 @@ namespace MarsSetup
                 lock (Lines) Lines.Clear();
                 L("checked " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                 Files();
+                WindowsFacts();
                 Policy();
                 CodeIntegrity();
                 Defender();
@@ -80,6 +81,61 @@ namespace MarsSetup
                     }
                 }
                 catch (Exception e) { L("file check failed: " + e.Message); }
+            }
+
+            /// <summary>Things about Windows that decide whether a game loads a winhttp.dll from its own folder.</summary>
+            static void WindowsFacts()
+            {
+                try
+                {
+                    using (var k = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                        L($"Windows {k?.GetValue("ProductName")} {k?.GetValue("DisplayVersion")} build {k?.GetValue("CurrentBuild")}.{k?.GetValue("UBR")}, channel {k?.GetValue("BuildBranch")}");
+                }
+                catch (Exception e) { L("Windows version unreadable: " + e.Message); }
+                try
+                {
+                    using (var k = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs"))
+                    {
+                        var names = k?.GetValueNames().Select(n => (k.GetValue(n) ?? "").ToString()).ToList() ?? new List<string>();
+                        bool known = names.Any(n => n.Equals("winhttp.dll", StringComparison.OrdinalIgnoreCase));
+                        L($"winhttp.dll is {(known ? "a KnownDLL: Windows always loads its own copy, the game folder's is ignored" : "not a KnownDLL")}; KnownDLLs: {string.Join(" ", names.Take(60))}");
+                    }
+                }
+                catch (Exception e) { L("KnownDLLs unreadable: " + e.Message); }
+                try
+                {
+                    foreach (var dll in new[] { "UnityPlayer.dll", "MoonSweepers.exe" })
+                    {
+                        var bytes = File.ReadAllBytes(P(dll));
+                        var text = System.Text.Encoding.ASCII.GetString(bytes);
+                        var hits = new[] { "winhttp.dll", "version.dll", "winmm.dll" }.Where(n => text.IndexOf(n, StringComparison.OrdinalIgnoreCase) >= 0);
+                        L($"{dll} names: {string.Join(", ", hits)}");
+                    }
+                }
+                catch (Exception e) { L("import check failed: " + e.Message); }
+                try
+                {
+                    using (var s = new ManagementObjectSearcher("SELECT HotFixID, InstalledOn, Description FROM Win32_QuickFixEngineering"))
+                    {
+                        var fixes = s.Get().Cast<ManagementObject>().Select(o => $"{o["InstalledOn"]} {o["HotFixID"]} {o["Description"]}").OrderByDescending(x => x).Take(6);
+                        L("latest Windows updates: " + string.Join(" | ", fixes));
+                    }
+                }
+                catch (Exception e) { L("update list unreadable: " + e.Message); }
+                try
+                {
+                    var q = new EventLogQuery("System", PathType.LogName,
+                        "*[System[Provider[@Name='Microsoft-Windows-WindowsUpdateClient'] and (EventID=19) and TimeCreated[timediff(@SystemTime) <= 259200000]]]") { ReverseDirection = true };
+                    int n = 0;
+                    using (var r = new EventLogReader(q))
+                        for (EventRecord e = r.ReadEvent(); e != null && n < 12; e = r.ReadEvent(), n++)
+                        {
+                            string m = ""; try { m = e.FormatDescription() ?? ""; } catch { }
+                            L($"update installed {e.TimeCreated:yyyy-MM-dd HH:mm}: {m.Replace("\r", " ").Replace("\n", " ")}");
+                        }
+                    if (n == 0) L("no Windows updates installed in the last 3 days");
+                }
+                catch (Exception e) { L("update events unreadable: " + e.Message); }
             }
 
             static bool HasMotw(string path)
@@ -166,8 +222,16 @@ namespace MarsSetup
 
             static void Modules(int pid)
             {
-                // BepInEx needs a few seconds to start the runtime; look at what is loaded after 25 s.
-                Thread.Sleep(25000);
+                // Look early and again later: winhttp.dll is loaded within the first seconds, BepInEx's runtime soon after.
+                foreach (int wait in new[] { 3000, 5000, 7000 })
+                {
+                    Thread.Sleep(wait);
+                    if (!ModulesOnce(pid)) return;
+                }
+            }
+
+            static bool ModulesOnce(int pid)
+            {
                 try
                 {
                     var p = Process.GetProcessById(pid);
@@ -177,8 +241,9 @@ namespace MarsSetup
                     L($"process {pid}: winhttp.dll loaded from {(win ?? "nowhere")}; coreclr.dll {(clr ?? "NOT loaded (BepInEx's .NET did not start)")}; {mods.Count} modules");
                     foreach (var m in mods.Where(m => m.StartsWith(game, StringComparison.OrdinalIgnoreCase)))
                         L($"process {pid} module from the game folder: {m.Substring(game.Length).TrimStart('\\')}");
+                    return true;
                 }
-                catch (Exception e) { L($"process {pid}: modules unreadable ({e.Message}), it may have exited (Steam restarts games it did not start itself)"); }
+                catch (Exception e) { L($"process {pid}: modules unreadable ({e.Message}), it may have exited (Steam restarts games it did not start itself)"); return false; }
             }
 
             static string CommandLine(int pid)

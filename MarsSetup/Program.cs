@@ -106,7 +106,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.5   ");
+                                                 |_|   setup v0.9.6   ");
             Console.ResetColor();
         }
 
@@ -734,9 +734,9 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.5: one test round for everything");
+            Head("Mars 0.9.6: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
-            Info("   quit, run me again and send me the report (option 3) so I can see why.");
+            Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
             Info("  1. Load it and play normally for 2 to 3 minutes, ideally near running belts. After a minute the");
             Info("     mod writes its research files by itself; typing 'collect' (Ctrl+Shift+K) does it again.");

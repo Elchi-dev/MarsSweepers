@@ -3,6 +3,14 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.6
+
+### Added
+- Diagnosis: the game's loaded modules are read 3, 8 and 15 s after start
+  (the first version waited 25 s, longer than the game ran), plus the
+  Windows build and recent updates, whether winhttp.dll is a KnownDLL, and
+  which proxy DLL names the game's executables use.
+
 ## 0.9.5
 
 ### Added

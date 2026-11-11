@@ -15,7 +15,7 @@ namespace MarsMod
     public class Plugin : BasePlugin
     {
         public const string Guid = "marsmod.mars";
-        public const string Version = "0.9.5";
+        public const string Version = "0.9.6";
 
         internal static new ManualLogSource Log;
         /// <summary>The previous start crashed before the mod's first frame: load only the essentials.</summary>
