@@ -73,7 +73,39 @@ namespace MarsMod
                 }
             }
             catch (Exception e) { lines.Add("port check failed: " + e.Message); }
+            // Which conveyor ports the game's definitions carry (vanilla machines and every Mars kind).
+            try
+            {
+                var kinds = new List<int> { 9, 10, 11, 12, 96 };
+                kinds.AddRange(VanillaBuild.Entries.Select(e => e.Kind));
+                foreach (int k in kinds)
+                {
+                    MoonDepotBuildDefinition d = null;
+                    try { d = w.BuildDefinition(k); } catch { }
+                    if (d == null) continue;
+                    object ports = null;
+                    try { ports = typeof(MoonDepotBuildDefinition).GetProperty("conveyorPorts")?.GetValue(d); } catch { }
+                    int n = ports == null ? 0 : (int)ports.GetType().GetProperty("Length").GetValue(ports);
+                    var parts = new List<string>();
+                    var item = ports?.GetType().GetProperty("Item");
+                    for (int i = 0; i < n; i++)
+                    {
+                        var pt = item.GetValue(ports, new object[] { i });
+                        parts.Add($"{R.Get(pt, "name")} @{R.Get(pt, "position")} dir {R.Get(pt, "direction")} {((R.Get(pt, "output") as bool?) == true ? "out" : "in")}");
+                    }
+                    lines.Add($"  kind {k} '{d.displayName}': {n} ports" + (n > 0 ? ": " + string.Join("; ", parts) : ""));
+                }
+            }
+            catch (Exception e) { lines.Add("port definitions failed: " + e.Message); }
             lines.Add($"logged so far: {entered} machine entries, {emitted} emits (first {MaxLog} of each go to the BepInEx log)");
+            try
+            {
+                string path = System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "MarsMod", "research", "belts.txt");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+                System.IO.File.AppendAllLines(path, new[] { $"# belts {DateTime.Now:yyyy-MM-dd HH:mm:ss} {(MarsState.CurrentIsMars ? "Mars" : "Moon")}" }.Concat(lines).Concat(new[] { "" }));
+                lines.Add("(also written to BepInEx/MarsMod/research/belts.txt)");
+            }
+            catch { }
             foreach (var l in lines) yield return l;
         }
     }
