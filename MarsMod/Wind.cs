@@ -131,7 +131,7 @@ namespace MarsMod
             p.ground = rnd.NextDouble() < 0.35;
             float h = p.ground ? Rand(0.02f, 0.5f) : Rand(0.2f, 9f);
             p.pos = ground + offset + up * h;
-            p.blocked = Haze.Storm + Haze.Front > 0.02f && Shelter.Roofed(p.pos, up);   // no dust under roofs
+            p.blocked = Haze.Storm + Haze.Front > 0.02f && (Shelter.Roofed(p.pos, up) || Shields.Covered(p.pos));   // no dust under roofs or a shield dome
             p.vel = wind;
             p.life = 0f;
             p.maxLife = Rand(1.2f, 3.5f);
@@ -239,7 +239,7 @@ namespace MarsMod
             if (p.maxLife > 0f && wind.sqrMagnitude > 0.5f && Vector3.Dot(offset, wind) > 0f) offset -= 2f * Vector3.Project(offset, wind.normalized);
             p.size = Rand(3f, 13f);
             p.pos = ground + offset + up * Rand(p.size * 0.2f, p.size * 1.2f);
-            p.blocked = Shelter.Roofed(p.pos, up);
+            p.blocked = Shelter.Roofed(p.pos, up) || Shields.Covered(p.pos);
             p.life = 0f; p.maxLife = Rand(6f, 14f);
             p.spin = Rand(-0.25f, 0.25f); p.angle = Rand(0f, 6.3f);
             p.shade = Rand(0.8f, 1.1f); p.seed = Rand(0f, 100f);
