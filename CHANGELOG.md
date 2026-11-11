@@ -3,6 +3,15 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.13
+
+### Added
+- Diagnosis reads each game process's DLL search path, image path and
+  current folder as Windows was given them at creation. The Process
+  Monitor recording of 2026-11-11 22:28 showed the game looking for
+  UnityPlayer.dll in System32, System and Windows before its own folder,
+  so a winhttp.dll or version.dll in the game folder can never win.
+
 ## 0.9.12
 
 ### Added

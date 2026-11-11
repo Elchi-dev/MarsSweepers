@@ -239,6 +239,7 @@ namespace MarsSetup
                     {
                         if (!seenPids.Add(p.Id)) continue;
                         L($"game process {p.Id} image load policy at first sight: {ImageLoadPolicy(p)}");
+                        L($"game process {p.Id} was given: {ProcessPaths(p.Id)}");
                         L($"game process {p.Id} started {Safe(() => p.StartTime.ToString("HH:mm:ss"))}, command line: {CommandLine(p.Id)}, parent: {Parent(p.Id)}");
                         int pid = p.Id;
                         new Thread(() => Modules(pid)) { IsBackground = true }.Start();
