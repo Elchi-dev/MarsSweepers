@@ -106,6 +106,24 @@ namespace MarsMod
         public static string Describe(Buildings.Rec b, MarsCatalog.Def def) =>
             $"<b>{def.Name}</b>  ·  offers change in {MinutesLeft:0} min\n<size=18>1: {Text(Current(b, 0))}     2: {Text(Current(b, 1))}</size>";
 
+        /// <summary>A purple glow under the pod, so an outpost can be found at night.</summary>
+        public static void Decorate(GameObject go)
+        {
+            try
+            {
+                var holder = new GameObject(); holder.name = "alien glow";
+                holder.transform.SetParent(go.transform, false);
+                holder.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+                var l = holder.AddComponent(Il2CppInterop.Runtime.Il2CppType.Of<Light>()).Cast<Light>();
+                l.type = LightType.Point;
+                l.color = new Color(0.65f, 0.35f, 1f);
+                l.range = 26f;
+                l.intensity = 3f;
+                l.shadows = LightShadows.None;
+            }
+            catch (Exception e) { Log.Once("alien-glow", "[aliens] glow failed: " + e.Message); }
+        }
+
         public static string Hint(string key) => $"[{key}] trade offer 1   [Shift+{key}] trade offer 2";
     }
 }

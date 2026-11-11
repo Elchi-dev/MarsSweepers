@@ -30,7 +30,8 @@ plugin). Newest first.
   Tiers climb with the distance from the Collector. A small box at the top
   right shows the ground under you and the current goal.
 - Alien trader outposts: three per world. They trade alien alloy for what
-  the crew makes; two offers each, new ones every 8 minutes.
+  the crew makes; two offers each, new ones every 8 minutes. They glow
+  purple at night; `aliens` lists them, `tp alien` and `tp ice` go there.
 - The ending: the planet cannon (alien alloy, machine parts, 30 rocket fuel,
   60 kW) fires at the Moon. The game's own ending sequence plays with the
   Moon in the sky. `ending` plays it right away (host, cheat).

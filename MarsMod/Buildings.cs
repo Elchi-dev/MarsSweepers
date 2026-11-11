@@ -470,6 +470,7 @@ namespace MarsMod
                         var go = Models.Spawn(def.Model, b.Pos, b.Rot);
                         go.name = $"Mars {def.Name} #{b.Id}";
                         views[b.Id] = go;
+                        if (b.Owner == Aliens.Owner) Aliens.Decorate(go);
                     }
                     catch (Exception e) { Log.Once("view-" + b.Type, $"[build] {def.Name} model failed: {e.Message}"); }
                 }

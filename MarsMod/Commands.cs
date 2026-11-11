@@ -27,6 +27,7 @@ namespace MarsMod
             ("money [amount]", "CHEAT: add money (default $10,000)"),
             ("unlock", "CHEAT: buy every upgrade in the upgrade tree for free"),
             ("give <item> [count]", "CHEAT: put Mars items in your backpack (give alone lists them)"),
+            ("aliens", "the alien trader outposts: where they are and what they offer now"),
             ("goals", "the Mars contract goals and the bonus for each"),
             ("power", "every power grid: what it makes, uses and stores"),
             ("belts", "research: belts near you and what the game says about the nearest Mars building's ports"),
@@ -46,7 +47,7 @@ namespace MarsMod
             ("haze test | debug", "turn the haze magenta for 10 s / show what the haze is doing"),
             ("spawn <cube|sphere|cylinder|capsule> [size] [colour] [look|here|x y z] [phys]", "place a test block (default: cube, 1 m, orange, where you look)"),
             ("blocks | del | clearblocks", "list blocks, remove the last one, remove all"),
-            ("tp <x> <y> <z> | tp up <m> | tp look | tp base", "teleport"),
+            ("tp <x> <y> <z> | tp up <m> | tp look | tp base | tp mine | tp ice | tp alien", "teleport"),
             ("fly [on|off] | noclip [on|off] | speed <x>", "movement helpers"),
             ("settings | set <name> <value>", "read / change MoonSettings live (terrain values only apply to a new world load)"),
             ("snap | tint", "MarsProbe: full snapshot / Mars tint test"),
@@ -106,6 +107,15 @@ namespace MarsMod
                 case "ending": if (!MarsNet.IsHost) { say("Only the host can start the ending."); break; } Ending.Fire(); say("Ending in " + Ending.Countdown + " s (cheat: no cannon needed)."); break;
                 case "belts": { var w0 = FindWalker(); foreach (var l in BeltResearch.Report(w0 != null ? w0.transform.position : Vector3.zero)) say(l); break; }
                 case "goals": foreach (var l in Goals.Report()) say(l); say(Goals.Current()); break;
+                case "aliens":
+                {
+                    var w0 = FindWalker(); var p0 = w0 != null ? w0.transform.position : Vector3.zero;
+                    var list = Buildings.Data.List.Where(b => b.Owner == Aliens.Owner).OrderBy(b => Vector3.Distance(b.Pos, p0)).ToList();
+                    if (list.Count == 0) { say("No alien outpost yet."); break; }
+                    foreach (var o in list) say($"  outpost #{o.Id}: {Vector3.Distance(o.Pos, p0):0} m to the {Haze.Compass((o.Pos - p0).normalized)}   1: {Aliens.Text(Aliens.Current(o, 0))}   2: {Aliens.Text(Aliens.Current(o, 1))}");
+                    say($"Offers change in {Aliens.MinutesLeft:0} min. 'tp alien' goes to the nearest outpost, 'tp ice' to the nearest ice mine.");
+                    break;
+                }
                 case "power": foreach (var l in Power.Report()) say(l); break;
                 case "mines":
                 {
@@ -440,6 +450,15 @@ namespace MarsMod
                 else m = Mines.All.OrderBy(x => Vector3.Distance(x.Position, p)).FirstOrDefault();
                 if (m == null) { say("No such mine (are mines generated yet? try 'mines')."); return; }
                 target = m.Position + m.Up * 4f + Vector3.Cross(m.Up, Vector3.right).normalized * 5f;
+            }
+            else if (mode == "alien" || mode == "aliens" || mode == "outpost" || mode == "ice")
+            {
+                Vector3? to = null;
+                if (mode == "ice") { var m = Mines.All.Where(x => x.Ore == "ice").OrderBy(x => Vector3.Distance(x.Position, p)).FirstOrDefault(); if (m != null) to = m.Position; }
+                else { var o = Buildings.Data.List.Where(b => b.Owner == Aliens.Owner).OrderBy(b => Vector3.Distance(b.Pos, p)).FirstOrDefault(); if (o != null) to = o.Pos; }
+                if (to == null) { say(mode == "ice" ? "No ice mine on this world yet." : "No alien outpost yet (the host places them once the mines exist)."); return; }
+                var up = to.Value.normalized;
+                target = to.Value + up * 4f + Vector3.Cross(up, Vector3.right).normalized * 7f;
             }
             else if (a.Length >= 4) target = new Vector3(F(a[1], p.x), F(a[2], p.y), F(a[3], p.z));
             else { say("Usage: tp x y z | tp up <m> | tp look | tp base"); return; }
