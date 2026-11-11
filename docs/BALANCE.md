@@ -58,7 +58,8 @@ need a generator or a big battery bank: storms are exactly when solar fails.
 ## Sector bounty tiers
 
 Fine dust x1, dust drift x1.6, dust crust x2.5, magnetite crust x4 of the
-game's own bounty. The tier comes from smooth noise plus the distance from
+game's own bounty. Scrubbing goes 1, 0.8, 0.65 and 0.5 as deep per pass, so
+the best tier takes twice as long and still pays twice as much per minute. The tier comes from smooth noise plus the distance from
 the Collector, so the far side of Mars pays several times more.
 
 ## Alien trades

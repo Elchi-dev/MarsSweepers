@@ -52,7 +52,9 @@ checking a new game version. All of them are installed in
 | 37 | `MoonWorld.EnterMachine(MoonDepotSnapshot, int, int)` | post | belt research: logs the first 40 canisters entering machines |
 | 38 | `MoonWorld.EmitCargo(MoonConveyorSnapshot, string, MoonCargo, double, out string)` | post | belt research: logs the first 40 cargo emits |
 
-Hooks 36 to 38 are new in 0.10.0 and have not run in the game yet.
+| 39 | `MoonWorld.CleaningDepthMultiplier(string)` | post | dust tiers: the local player scrubs slower in crust and magnetite sectors |
+
+Hooks 36 to 39 are new in 0.10.0 and have not run in the game yet.
 
 ## Not hooked, called
 

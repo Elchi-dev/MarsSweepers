@@ -25,7 +25,6 @@ window.
 
 ## Later
 
-- Thicker dust in higher tiers (today the tier is only the reward).
 - Storms jam belts too; scrubbing gets faster with upgrades.
 - Gates that read prices from the market board.
 - More alien offers, and outposts that move after a while.

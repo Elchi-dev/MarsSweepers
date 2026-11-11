@@ -9,12 +9,18 @@ namespace MarsMod
     /// magnetite crust. The tier comes from smooth noise over the planet (so tiers form zones, the same on every
     /// PC) and climbs with the distance from the home Collector, so the far side of the planet is worth the trip.
     /// When a sector is finished the host pays the game's normal bounty, then this adds the tier's bonus on top.
-    /// Thicker dust is not simulated yet (the game's dust is one thickness everywhere); the tier is the reward.
+    /// The higher tiers also scrub slower: each cleaning pass goes less deep (the game's cleaning depth
+    /// multiplier, scaled for the local player by the tier they stand in).
     /// </summary>
     internal static class DustTiers
     {
         public static readonly string[] Names = { "Fine dust", "Dust drift", "Dust crust", "Magnetite crust" };
         public static readonly float[] Bonus = { 1f, 1.6f, 2.5f, 4f };
+        /// <summary>How deep one cleaning pass goes in each tier: crust and magnetite take longer to scrub.</summary>
+        public static readonly float[] Depth = { 1f, 0.8f, 0.65f, 0.5f };
+
+        /// <summary>The tier under the local player (from the HUD check, every 1.5 s).</summary>
+        public static int Here => shown < 0 ? 0 : shown;
         static readonly string[] Colours = { "#C9B8A6", "#FFC266", "#FF9A5A", "#C58BFF" };
 
         static Vector3 home = Vector3.up;
@@ -48,7 +54,14 @@ namespace MarsMod
             try { return TierAt(world.Regions.Centers[region]); } catch { return 0; }
         }
 
-        public static string Label(int tier) => $"<color={Colours[tier]}>{Names[tier]}</color>" + (tier > 0 ? $" (bounty x{Bonus[tier]:0.#})" : "");
+        public static string Label(int tier) => $"<color={Colours[tier]}>{Names[tier]}</color>" + (tier > 0 ? $" (bounty x{Bonus[tier]:0.#}, scrubs {1f / Depth[tier]:0.#}x slower)" : "");
+
+        /// <summary>Postfix on MoonWorld.CleaningDepthMultiplier: the local player's cleaning slows down in the higher tiers.</summary>
+        public static void CleaningDepth(string player, ref float result)
+        {
+            if (!MarsWorld.InMarsWorld || player != Buildings.Me) return;
+            result *= Depth[Here];
+        }
 
         // ------------------------------------------------------------------ host: the bonus when a sector is paid
 
