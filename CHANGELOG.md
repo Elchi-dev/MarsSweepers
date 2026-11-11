@@ -3,6 +3,13 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.12
+
+### Added
+- Setup option [13]: records the game's start with Microsoft's Process
+  Monitor and keeps every lookup of winhttp.dll and version.dll with
+  Windows' answer, in MarsProbe/loader-trace.csv and the report.
+
 ## 0.9.11
 
 ### Added
