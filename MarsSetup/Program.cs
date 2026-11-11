@@ -13,7 +13,7 @@ using Microsoft.Win32;
 
 namespace MarsSetup
 {
-    internal static class Program
+    internal static partial class Program
     {
         const string SteamAppId = "5335510";
         const string GameExe = "MoonSweepers.exe";
@@ -60,6 +60,7 @@ namespace MarsSetup
                     Console.WriteLine("  [6] Remove ALL modding from the game (BepInEx and every mod; moved to a backup folder)");
                     Console.WriteLine("  [7] Open the game folder");
                     Console.WriteLine("  [8] Open the Mars saves folder");
+                    Console.WriteLine("  [9] Check why mods do not load (also runs by itself on every game start)");
                     Console.WriteLine("  [0] Exit");
                     Console.Write("> ");
                     string c = (Console.ReadLine() ?? "").Trim();
@@ -80,6 +81,7 @@ namespace MarsSetup
                         case "6": RemoveAll(); break;
                         case "7": Process.Start("explorer.exe", "\"" + game + "\""); break;
                         case "8": Directory.CreateDirectory(MarsSaveDir); Process.Start("explorer.exe", "\"" + MarsSaveDir + "\""); break;
+                        case "9": Diagnose.Static(); foreach (var l in Diagnose.Lines) Info(l); break;
                         case "0": case "": return 0;
                     }
                 }
@@ -104,7 +106,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.4   ");
+                                                 |_|   setup v0.9.5   ");
             Console.ResetColor();
         }
 
@@ -729,9 +731,10 @@ namespace MarsSetup
                 while (!GameRunning() && DateTime.Now < until) Thread.Sleep(1000);
                 if (!GameRunning()) { Warn("The game didn't start. Start it from Steam yourself, I'll keep waiting."); while (!GameRunning()) Thread.Sleep(1000); }
             }
+            Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.4: one test round for everything");
+            Head("Mars 0.9.5: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   quit, run me again and send me the report (option 3) so I can see why.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
@@ -753,6 +756,9 @@ namespace MarsSetup
                 Thread.Sleep(1000);
             }
             Console.WriteLine();
+            Head("What the game loaded");
+            foreach (var l in Diagnose.Lines.ToList().Where(x => x.StartsWith("process") || x.StartsWith("game process")))
+                Info(l);
             Thread.Sleep(2000);
             Collect();
         }
@@ -810,6 +816,8 @@ namespace MarsSetup
                 sb.AppendLine("Game folder: " + game);
                 sb.AppendLine("Windows: " + Environment.OSVersion + (Environment.Is64BitOperatingSystem ? " x64" : ""));
                 sb.AppendLine("Steam launch options: " + LaunchOptions());
+                if (Diagnose.Lines.Count == 0) Diagnose.Static();
+                foreach (var l in Diagnose.Lines.ToList()) sb.AppendLine("diag: " + l);
                 foreach (var w in LoaderProblems()) sb.AppendLine("Loader check: " + w);
                 try { sb.AppendLine("doorstop_config.ini:"); sb.AppendLine(File.ReadAllText(P("doorstop_config.ini"))); } catch { }
                 try { sb.AppendLine("dotnet files: " + Directory.GetFiles(P("dotnet")).Length); } catch { }
