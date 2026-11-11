@@ -52,7 +52,9 @@ plugin). Newest first.
   $2000). `goals` lists them; finishing one tells everyone.
 - Belt research: passive hooks log the first canisters entering machines
   and cargo put on belts, and `belts` shows what the game says about the
-  ports of the nearest Mars building. The plan is in docs/BELTS.md.
+  ports of the nearest Mars building and the conveyor ports of the game's
+  definitions. The plan is in docs/BELTS.md. Its first steps are built as
+  an experiment, off by default: `beltmode on` (host).
 - MarsSetup is a window now: Install / Play, the patcher download is picked
   up by itself, no terminal. It installs for playing: no MarsProbe and no
   BepInEx console window. `MarsSetup.exe --dev` opens the old tester menu.

@@ -23,10 +23,18 @@ about the game's belts and what is still measured before any of it changes.
 
 1. **Measure (0.10.0).** Passive hooks on `EnterMachine` and `EmitCargo`
    log the first 40 calls; `belts` in the terminal shows the belts near the
-   player and what the game says about the ports of the nearest Mars
-   building. Open questions: does the game see the ports of a Mars
+   player, what the game says about the ports of the nearest Mars building
+   and the conveyor ports in the game's definitions (vanilla machines and
+   every Mars kind), and writes it all to research/belts.txt. Each
+   definition carries `conveyorPorts` (name, position, direction, in or
+   out); the Mars kinds are copies of a donor, so they carry the donor's
+   ports, not their own. Open questions: does the game see the ports of a Mars
    building at all (they are built on a donor definition), and does
    `EmitCargo` return the new canister's id through `nextCanisterId`.
+Steps 2 to 4 are built in 0.10.0 as an experiment, off by default:
+`beltmode on` (host) switches them on. Whether they work depends on the
+answers from step 1.
+
 2. **Out.** A Mars machine whose output port starts a belt emits its product
    with `EmitCargo` as a tiny canister (so a vanilla packager pays next to
    nothing for it). The host keeps a map canister id to Mars item, saved
