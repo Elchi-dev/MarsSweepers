@@ -30,6 +30,7 @@ namespace MarsMod
             ("build <drill|smelter|container> | buildings", "place a Mars building directly / list all of them"),
             ("mines | tp mine [id]", "list the nearest mines / teleport to one"),
             ("research", "study the game's machines and build menu, render reference pictures (for new Mars machines)"),
+            ("collect", "write everything needed for the next features: economy, belts, machines, power, a snapshot"),
             ("market", "Mars market prices, what moved them, and any boom or crash going on"),
             ("economy", "write the upgrade tree, prices and money numbers to research/economy.txt (works in Moon worlds too)"),
             ("terrain", "check the base site: ground vs. base floors, and whether the valley rim is walkable"),
@@ -105,6 +106,8 @@ namespace MarsMod
                     break;
                 }
                 case "research": Research.Request(say); break;
+                case "collect": foreach (var l in Economy.Collect(true)) say(l); break;
+                case "deep": foreach (var l in Deep.Dump(Arg(1))) say(l); break;
                 case "market": foreach (var l in Market.Report()) say(l); break;
                 case "economy": foreach (var l in Economy.Dump()) say(l); break;
                 case "terrain": foreach (var l in TerrainReport()) say(l); break;
@@ -532,7 +535,7 @@ namespace MarsMod
 
         // ------------------------------------------------------------------ MarsProbe
 
-        static string Probe(string method)
+        internal static string Probe(string method)
         {
             var t = Type.GetType("MarsProbe.Plugin, MarsProbe", false);
             var m = t?.GetMethod(method, BindingFlags.Public | BindingFlags.Static);

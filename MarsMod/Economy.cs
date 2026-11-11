@@ -24,6 +24,18 @@ namespace MarsMod
         static double lastWallet = double.NaN;
         static double income, spent;
         static string file;
+        static IntPtr collectedFor;
+
+        /// <summary>economy + deep dump + a MarsProbe snapshot (+ the reference renders when asked from the terminal).</summary>
+        public static IEnumerable<string> Collect(bool renders)
+        {
+            var outp = new List<string>();
+            try { outp.AddRange(Dump()); } catch (Exception e) { outp.Add("economy failed: " + e.Message); }
+            try { outp.AddRange(Deep.Dump(null)); } catch (Exception e) { outp.Add("deep dump failed: " + e.Message); }
+            try { outp.Add(Commands.Probe("RequestSnapshot") ?? "(MarsProbe not installed, no snapshot)"); } catch { }
+            if (renders) try { Research.Request(s => outp.Add(s)); } catch { }
+            return outp;
+        }
 
         static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
@@ -43,6 +55,12 @@ namespace MarsMod
                 file = Path.Combine(Dir, "economy", $"{(MarsState.CurrentIsMars ? "mars" : "moon")}-slot{slot}-{DateTime.Now:yyyyMMdd-HHmmss}.csv");
             }
             try { Row(w, now); } catch (Exception e) { Log.Once("economy-row", "[economy] " + e.Message); }
+            // Once per world and game start, a minute in: write the research files by themselves.
+            if (now - worldSince > 60f && collectedFor != world)
+            {
+                collectedFor = world;
+                foreach (var l in Collect(false)) Plugin.Log.LogMessage("[collect] " + l);
+            }
         }
 
         static void Row(MoonWorld w, float now)
