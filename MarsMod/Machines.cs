@@ -16,6 +16,9 @@ namespace MarsMod
     {
         static Dictionary<string, int> Items(Buildings.Rec b) => b.Items;
 
+        public const int AutoKeep = 20;          // auto-selling keeps this many of each material
+        public const float AutoRatio = 1.1f;     // and sells only at 10 % over the normal price
+
         // ------------------------------------------------------------------ production (host, every 0.5 s)
 
         public static bool Produce(Buildings.Rec b, Def def, float dt, float power)
@@ -45,6 +48,29 @@ namespace MarsMod
                         foreach (var kv in def.In) Buildings.AddTo(b.Items, kv.Key, -kv.Value);
                         foreach (var kv in def.Out) { Buildings.AddTo(b.Items, kv.Key, kv.Value); Goals.Produced(kv.Key, kv.Value); }
                         changed = true;
+                    }
+                    break;
+                }
+                case Role.Market:
+                {
+                    if (!b.Active) break;
+                    b.Progress += dt / 30f;
+                    if (b.Progress < 1f) break;
+                    b.Progress = 0f;
+                    double money = 0; int sold = 0;
+                    foreach (var kv in Buildings.Items.Storage.ToList())
+                    {
+                        int n = kv.Value - AutoKeep;
+                        if (n <= 0 || Market.Price(kv.Key) < MarsItems.Sell(kv.Key) * AutoRatio) continue;
+                        money += Market.Sell(kv.Key, n); sold += n;
+                        Buildings.AddTo(Buildings.Items.Storage, kv.Key, -n);
+                    }
+                    if (sold > 0)
+                    {
+                        Buildings.StockChanged();
+                        Buildings.Earn(Commands.FindWorld(), Buildings.Me, money);
+                        Plugin.Log.LogMessage($"[market] auto-sold {sold} items for ${money:0}");
+                        MarsWorld.Notice($"Market board sold {sold} items for ${money:0}");
                     }
                     break;
                 }
@@ -177,17 +203,15 @@ namespace MarsMod
                 }
                 case Role.Market:
                 {
-                    // E: sell the material that pays best right now (against its normal price). Shift+E: sell it all.
-                    var stock = Buildings.Items.Storage.Where(kv => kv.Value > 0).ToList();
-                    if (stock.Count == 0) return "The crew storage is empty: bring materials to a container port first.";
+                    // E: sell the material that pays best right now (against its normal price). Shift+E: auto-selling on/off.
                     if (alt)
                     {
-                        double all = 0; int n = 0;
-                        foreach (var kv in stock) { all += Market.Sell(kv.Key, kv.Value); n += kv.Value; }
-                        Buildings.Items.Storage.Clear();
-                        Buildings.Earn(world, player, all);
-                        return $"Sold all {n} items for ${all:0}.";
+                        b.Active = !b.Active;
+                        return b.Active ? $"Auto-selling ON: every 30 s it sells what the crew storage has beyond {AutoKeep} of each material, while its price is {AutoRatio * 100f - 100f:0}% or more above normal."
+                                        : "Auto-selling off.";
                     }
+                    var stock = Buildings.Items.Storage.Where(kv => kv.Value > 0).ToList();
+                    if (stock.Count == 0) return "The crew storage is empty: bring materials to a container port first.";
                     var best = stock.OrderByDescending(kv => Market.Price(kv.Key) / Math.Max(0.01f, MarsItems.Sell(kv.Key))).First();
                     double money2 = Market.Sell(best.Key, best.Value);
                     Buildings.Items.Storage.Remove(best.Key);
@@ -248,7 +272,7 @@ namespace MarsMod
                         int have = Buildings.Count(Buildings.Items.Storage, id);
                         return $"{MarsItems.Name(id)} ${Market.Price(id):0.0} {Market.Arrow(id)}" + (have > 0 ? $" <color=#7FD8F0>×{have}</color>" : "");
                     });
-                    return $"{name}\n<size=18>" + string.Join("   ", lines) + "</size>";
+                    return $"{name}" + (b.Active ? "  <color=#7CFF9A>auto-selling</color>" : "") + "\n<size=18>" + string.Join("   ", lines) + "</size>";
                 }
                 case Role.Light: return $"{name}  ·  clears the storm air around it, carries power 25 m" + power;
                 case Role.Solar: return $"{name}  ·  {Power.SolarNow(b, def):0.0} of {def.PowerMake:0} kW" + power;
@@ -280,7 +304,7 @@ namespace MarsMod
                 case Role.Recipe: return $"[{key}] take products and load {MarsItems.Cost(def.In)}   [Shift+{key}] only take products";
                 case Role.Generator: return $"[{key}] load rocket fuel";
                 case Role.Storage: return $"[{key}] store your backpack   [Shift+{key}] sell the crew storage at market prices";
-                case Role.Market: return $"[{key}] sell the best-paying material   [Shift+{key}] sell everything";
+                case Role.Market: return $"[{key}] sell the best-paying material   [Shift+{key}] auto-selling {(b.Active ? "off" : "on")}";
                 case Role.Solar: return b.Dust > 0.05f ? $"[{key}] wipe the dust off" : "";
                 case Role.Trader: return Aliens.Hint(key);
                 case Role.Cannon: return $"[{key}] load rocket fuel   [Shift+{key}] FIRE at the Moon";
