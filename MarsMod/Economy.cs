@@ -172,6 +172,19 @@ namespace MarsMod
                 }
             });
 
+            if (MarsState.CurrentIsMars)
+            {
+                L("");
+                L("## mars");
+                Try(() => L($"goals done {Goals.Data.Done}, trades {Goals.Data.Trades}, shield up once {Goals.Data.ShieldUp}, cannon fired {Goals.Data.Fired}"));
+                Try(() => L("made by machines: " + string.Join(", ", Goals.Data.Made.Select(kv => $"{kv.Key} {kv.Value}"))));
+                Try(() => L("buildings: " + string.Join(", ", Buildings.Data.List.GroupBy(b => b.Type).Select(g => $"{g.Key} {g.Count()}"))));
+                Try(() => L("crew storage: " + MarsItems.List(Buildings.Items.Storage)));
+                Try(() => { foreach (var l in Power.Report()) L(l); });
+                Try(() => L("market: " + string.Join(", ", MarsItems.All.Keys.Select(id => $"{id} ${Market.Price(id):0.0}"))));
+                Try(() => L($"ground tier here {DustTiers.Here} ({DustTiers.Names[DustTiers.Here]})"));
+            }
+
             string path = Path.Combine(Dir, "research", "economy.txt");
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllLines(path, lines);
