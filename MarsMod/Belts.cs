@@ -39,7 +39,7 @@ namespace MarsMod
         public static string Toggle(bool on)
         {
             Data.On = on; dirty = true; Save();
-            return on ? "Mars belts ON (experimental): Mars machines put their products on belts that start at their ports." : "Mars belts off.";
+            return on ? "Mars belts ON (experimental). Save and load the world once so the Mars buildings get their belt ports." : "Mars belts off (load the world again to drop the ports).";
         }
 
         static void Save() { if (dirty && MarsNet.IsHost) { MarsData.Set(Key, Data); dirty = false; } }
@@ -47,10 +47,50 @@ namespace MarsMod
         /// <summary>Where a Mars building's ports are in the world (from its model's port_N markers).</summary>
         public static IEnumerable<Vector3> Ports(Buildings.Rec b, MarsCatalog.Def def)
         {
-            Models.Template t;
-            try { t = Models.Get(def.Model); } catch { yield break; }
-            foreach (var m in t.Markers)
-                if (m.Key.StartsWith("port_")) yield return b.Pos + b.Rot * m.Value.localPosition;
+            foreach (var (pos, _) in LocalPorts(def)) yield return b.Pos + b.Rot * pos;
+        }
+
+        /// <summary>The ports in the building's own space: position and outward direction (from the model's markers).</summary>
+        public static List<(Vector3 pos, Vector3 dir)> LocalPorts(MarsCatalog.Def def)
+        {
+            var list = new List<(Vector3, Vector3)>();
+            try
+            {
+                var t = Models.Get(def.Model);
+                foreach (var m in t.Markers.Where(m => m.Key.StartsWith("port_")).OrderBy(m => m.Key))
+                {
+                    var p = t.Root.transform.InverseTransformPoint(m.Value.position);
+                    var flat = new Vector3(p.x, 0f, p.z);
+                    var dir = Mathf.Abs(flat.x) > Mathf.Abs(flat.z) ? new Vector3(Mathf.Sign(flat.x), 0f, 0f) : new Vector3(0f, 0f, Mathf.Sign(flat.z));
+                    list.Add((p, dir));
+                }
+            }
+            catch (Exception e) { Log.Once("belt-ports-" + def.Id, "[belts] ports of " + def.Id + ": " + e.Message); }
+            return list;
+        }
+
+        /// <summary>Give a Mars building definition its own conveyor ports, so the game's belts snap to them.
+        /// Port 0 is an output, the rest are inputs (extractors: all outputs; the container port: all inputs).</summary>
+        public static void SetPorts(MoonDepotBuildDefinition d, MarsCatalog.Def def)
+        {
+            var ports = LocalPorts(def);
+            if (ports.Count == 0) return;
+            try
+            {
+                var arr = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<MoonDepotBuildDefinition.ConveyorPort>(ports.Count);
+                for (int i = 0; i < ports.Count; i++)
+                {
+                    var cp = new MoonDepotBuildDefinition.ConveyorPort();
+                    cp.name = "mars_port_" + i;
+                    cp.position = ports[i].pos;
+                    cp.direction = ports[i].dir;
+                    cp.output = def.Role == MarsCatalog.Role.Extractor || def.Role != MarsCatalog.Role.Storage && i == 0;
+                    arr[i] = cp;
+                }
+                d.conveyorPorts = arr;
+                Plugin.Log.LogMessage($"[belts] {def.Id}: {ports.Count} conveyor ports set");
+            }
+            catch (Exception e) { Log.Once("belt-setports-" + def.Id, "[belts] could not set ports of " + def.Id + ": " + e.Message); }
         }
 
         // ------------------------------------------------------------------ out (host, every 2 s)

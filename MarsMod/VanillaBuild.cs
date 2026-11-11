@@ -146,6 +146,7 @@ namespace MarsMod
                 def.height = Mathf.Max(0.5f, t.Bounds.max.y);
                 def.scale = 1f;
                 def.floorOffset = 0f;
+                if (Belts.Data.On) Belts.SetPorts(def, e.Def);   // experimental: only with 'beltmode on' (otherwise the donor's ports stay, as before)
                 e.Definition = def;
             }
         }
