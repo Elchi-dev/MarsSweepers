@@ -52,8 +52,8 @@ namespace MarsSetup
                     Status();
                     Console.WriteLine();
                     Head("What do you want to do?");
-                    Console.WriteLine("  [1] Install / update everything (BepInEx + patcher + MarsProbe)");
-                    Console.WriteLine("  [2] Start the game, then build the report when you close it");
+                    Console.WriteLine("  [1] Install / update everything, start the game, build the report when you close it");
+                    Console.WriteLine("  [2] Start the game (updates the mod first if needed), report when you close it");
                     Console.WriteLine("  [3] Build the report now (game must be closed)");
                     Console.WriteLine("  [4] Remove MarsProbe only (the Mars mod stays)");
                     Console.WriteLine("  [5] Remove the Mars mod (Mars saves are kept, Moon saves are never touched)");
@@ -70,7 +70,10 @@ namespace MarsSetup
                             if (Install() && Ask("Start the game now and build the report automatically when you close it?", true))
                                 RunAndCollect();
                             break;
-                        case "2": RunAndCollect(); break;
+                        case "2":
+                            if (!ModCurrent() || !File.Exists(ProbePath)) { Info("This setup carries a newer Mars mod: installing it first."); if (!Install()) break; }
+                            RunAndCollect();
+                            break;
                         case "3": Collect(); break;
                         case "4": RemoveProbe(); break;
                         case "5": RemoveMars(); break;
@@ -101,7 +104,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.1   ");
+                                                 |_|   setup v0.9.2   ");
             Console.ResetColor();
         }
 
@@ -258,7 +261,7 @@ namespace MarsSetup
             string bepState = !bep ? "not installed" : SameAsEmbedded("BepInEx/core/BepInEx.Unity.IL2CPP.dll", BepCore) ? "6.0.0-be.791 (correct build)" : "installed, but a DIFFERENT build";
             Line("BepInEx", bepState, bep);
             Line("MoonSweepers BepInEx Patcher", File.Exists(PatcherPath) ? "installed" : "missing", File.Exists(PatcherPath));
-            Line("Mars mod", File.Exists(MarsPath) ? "installed" : "not installed", File.Exists(MarsPath));
+            Line("Mars mod", !File.Exists(MarsPath) ? "not installed" : ModCurrent() ? "installed, this version" : "installed, OLDER version: pick [1] to update", File.Exists(MarsPath) && ModCurrent());
             Line("MarsProbe (debug)", File.Exists(ProbePath) ? "installed" : "not installed", File.Exists(ProbePath));
             int marsSlots = Directory.Exists(MarsSaveDir) ? Directory.GetFiles(MarsSaveDir, "marsmod.json", SearchOption.AllDirectories).Length : 0;
             Line("Mars save slots", marsSlots.ToString(), true);
@@ -300,6 +303,19 @@ namespace MarsSetup
         static Stream Res(string name) => typeof(Program).Assembly.GetManifestResourceStream(name) ?? throw new FileNotFoundException("embedded " + name);
 
         static string Sha(Stream s) { using (var h = SHA256.Create()) return BitConverter.ToString(h.ComputeHash(s)); }
+
+        /// <summary>The installed MarsMod.dll is exactly the one in this setup.</summary>
+        static bool ModCurrent()
+        {
+            try
+            {
+                if (!File.Exists(MarsPath)) return false;
+                string a; using (var s = Res("MarsMod.dll")) a = Sha(s);
+                string b; using (var s = File.OpenRead(MarsPath)) b = Sha(s);
+                return a == b;
+            }
+            catch { return false; }
+        }
 
         static bool SameAsEmbedded(string entryName, string file)
         {
