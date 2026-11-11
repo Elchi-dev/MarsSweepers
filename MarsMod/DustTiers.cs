@@ -101,7 +101,7 @@ namespace MarsMod
             pending = -1;
             bool first = shown < 0;
             shown = t;
-            if (!first || t > 0) MarsWorld.Notice("Ground: " + Label(t));
+            if (t >= 2 && !first) MarsWorld.Notice("Ground: " + Label(t));   // the goal box always shows the tier; only the rich ones get a notice
         }
 
         public static void Reset() { shown = -1; pending = -1; }

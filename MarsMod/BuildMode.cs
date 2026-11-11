@@ -24,7 +24,9 @@ namespace MarsMod
         static Material ghostOk, ghostBad;
         static float yaw, removeArmedUntil;
         static int removeArmedId = -1;
-        static MarsUi.Box menuBox, hintBox, promptBox, packBox;
+        static MarsUi.Box menuBox, hintBox, promptBox, packBox, goalBox;
+        static string goalText;
+        static float nextGoal;
         static string lastReason;
 
         public static bool Busy => mode != Mode.None;
@@ -32,7 +34,7 @@ namespace MarsMod
         public static void Reset()
         {
             Cancel();
-            menuBox?.Set(null); hintBox?.Set(null); promptBox?.Set(null); packBox?.Set(null);
+            menuBox?.Set(null); hintBox?.Set(null); promptBox?.Set(null); packBox?.Set(null); goalBox?.Set(null); goalText = null;
         }
 
         public static void Frame(float now, float dt)
@@ -43,14 +45,21 @@ namespace MarsMod
                 hintBox = MarsUi.Make("Mars build hint", 0.5f, 0.13f, 1000, 92, 22, 514);
                 promptBox = MarsUi.Make("Mars prompt", 0.5f, 0.24f, 1000, 92, 22, 514);
                 packBox = MarsUi.Make("Mars backpack", 0.985f, 0.66f, 380, 210, 20, 257);
+                goalBox = MarsUi.Make("Mars goal", 0.985f, 0.93f, 380, 78, 16, 257);
             }
             var kb = UnityInput.Current;
             bool ui = !Terminal.Open && MarsWorld.PlayerReady;
-            if (!ui) { menuBox.Set(null); hintBox.Set(null); promptBox.Set(null); packBox.Set(null); return; }
+            if (!ui) { menuBox.Set(null); hintBox.Set(null); promptBox.Set(null); packBox.Set(null); goalBox.Set(null); goalText = null; return; }
+            if (now >= nextGoal)
+            {
+                nextGoal = now + 1f;
+                string g = $"<color=#E8743B><b>MARS</b></color>  {Goals.Current()}\n<size=14>Ground: {DustTiers.Label(DustTiers.Here)}</size>";
+                if (g != goalText) { goalText = g; goalBox.Set(g); }
+            }
 
             if (kb.GetKeyDown(KeyCode.N))
             {
-                if (VanillaBuild.Ready && mode == Mode.None) MarsWorld.Urgent("Mars machines are in the normal build menu now: build tool → Production / Logistics.");
+                if (VanillaBuild.Ready && mode == Mode.None) MarsWorld.Urgent("Mars machines are in the normal build menu now: build tool → Production / Logistics / Power.");
                 else if (mode == Mode.None) OpenMenu(); else Cancel();
             }
 

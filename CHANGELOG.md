@@ -27,8 +27,8 @@ plugin). Newest first.
 - Dust tiers. Sectors hold fine dust, drifts, crust or magnetite crust; the
   tier pays x1, x1.6, x2.5 or x4 of the normal sector bounty and takes up
   to twice as long to scrub (each pass goes 1, 0.8, 0.65 or 0.5 as deep).
-  Tiers climb with the distance from the Collector. The HUD says when the
-  ground changes.
+  Tiers climb with the distance from the Collector. A small box at the top
+  right shows the ground under you and the current goal.
 - Alien trader outposts: three per world. They trade alien alloy for what
   the crew makes; two offers each, new ones every 8 minutes.
 - The ending: the planet cannon (alien alloy, machine parts, 30 rocket fuel,
