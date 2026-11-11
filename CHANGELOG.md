@@ -3,10 +3,24 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
-## Unreleased
+## 0.8.1
+
+### Added
+- `economy` command: writes the whole upgrade tree (prices, requirements,
+  effect per level), the money settings, section count and weight, building
+  prices and the current multipliers to `BepInEx/MarsMod/research/economy.txt`.
+  Works in Moon worlds too.
+- Economy log: every 15 s of play, in any world, one row with money earned
+  and spent, deposited kilograms, cleaned sections and upgrade levels, in
+  `BepInEx/MarsMod/economy/`. It only reads. These numbers are what Mars
+  prices and machine speeds get balanced against.
 
 ### Changed
 - Licensed under MIT (was all rights reserved).
+
+### Fixed
+- The setup report now includes each Mars world's data, building and
+  settings files (it looked for a file name no longer used).
 
 ## 0.8.0
 
