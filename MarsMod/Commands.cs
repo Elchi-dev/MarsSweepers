@@ -18,6 +18,7 @@ namespace MarsMod
             ("help", "this list"),
             ("info", "where you are: position, altitude, latitude/longitude, speed, sun, storm"),
             ("mars", "mod status: version, world, slot, hooks"),
+            ("mars slot <n>", "make empty save slot n a Mars world (if the Moon or Mars question did not show up)"),
             ("storm on | now | off | stop | auto | <0-1>", "storm with a 20 s front / instantly / dies down / gone / back to schedule / fixed level"),
             ("storm", "storm status and the next scheduled storm"),
             ("net", "co-op channel status, pings every crew member"),
@@ -65,7 +66,9 @@ namespace MarsMod
                 case "clear": Terminal.Clear(); break;
                 case "close": MarsWorld.Defer(Terminal.CloseNow); break;
                 case "info": case "pos": Info(say); break;
-                case "mars": case "status": Status(say); break;
+                case "mars": case "status":
+                    if (Arg(1) == "slot") { say(MakeMarsSlot(Arg(2))); break; }
+                    Status(say); break;
                 case "storm": say(a.Length > 1 ? Haze.Command(Arg(1)) : Haze.Info()); break;
                 case "haze": HazeCmd(a, say); break;
                 case "net": MarsNet.PingAll(); foreach (var l in MarsNet.Status()) say(l); say("(pinged everyone; type 'net' again in a second for the times)"); break;
@@ -534,6 +537,18 @@ namespace MarsMod
         }
 
         // ------------------------------------------------------------------ MarsProbe
+
+        static string MakeMarsSlot(string arg)
+        {
+            if (!int.TryParse(arg, out int slot) || slot < 0 || slot > 9) return "Usage: mars slot <number>, e.g. 'mars slot 0' (slots count from 0, top to bottom).";
+            if (MarsState.IsMarsSlot(slot)) return $"Slot {slot} is already a Mars world.";
+            bool used = true;
+            try { used = MoonSaveSlots.Used(slot); } catch { }
+            if (used) return $"Slot {slot} holds a Moon world. Delete it in the menu first; Moon worlds are never turned into Mars.";
+            MarsState.MarkMars(slot);
+            Patches.Forget(slot);
+            return $"Slot {slot} is now a Mars slot. Pick it in the menu and press Play.";
+        }
 
         internal static string Probe(string method)
         {
