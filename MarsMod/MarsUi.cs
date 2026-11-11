@@ -8,7 +8,7 @@ namespace MarsMod
     internal static class MarsUi
     {
         static GameObject root;
-        static object font;
+        internal static object font;
         static Type tmpT, imageT;
 
         public sealed class Box

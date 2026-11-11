@@ -24,7 +24,8 @@ plugin). Newest first.
 - Logistics hub: its drones empty every Mars machine within 30 m into the
   crew storage and refill their inputs from it every 5 s (4 kW). Until Mars
   items ride on belts, this is how a base runs by itself.
-- Market board: every Mars price and where it is heading; sells the
+- Market board: every Mars price and where it is heading, live on its
+  screen in the world; sells the
   best-paying material from the crew storage. Shift + interact switches on
   auto-selling: every 30 s it sells what is beyond 20 of each material
   while the price is 10 % or more above normal.

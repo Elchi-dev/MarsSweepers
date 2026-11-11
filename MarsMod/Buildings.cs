@@ -545,6 +545,8 @@ namespace MarsMod
                 }
         }
 
+        public static GameObject ViewOf(int id) => views.TryGetValue(id, out var v) && v != null ? v : null;
+
         public static void ClearViews()
         {
             if (MarsNet.IsHost && MarsData.Loaded) Sync(true);   // nothing unsaved is lost when leaving
