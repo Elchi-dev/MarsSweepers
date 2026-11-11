@@ -211,6 +211,7 @@ namespace MarsMod
                 case Role.Cannon:
                     return $"{name}  ·  rocket fuel {Buildings.Count(b.Items, "rocket_fuel")}/{def.Cap}" + power;
                 case Role.Shield:
+                    Shields.Preview(b);
                     return $"{name}  ·  " + (Shields.IsUp(b) ? "<color=#7FD8F0>dome up</color>" : Shields.Wanted ? "<color=#FF6B5A>no power for the dome</color>" : "waiting for a storm") + power;
             }
             return name;

@@ -27,6 +27,11 @@ namespace MarsMod
 
         static readonly Dictionary<int, Coverage> cover = new Dictionary<int, Coverage>();
         static Material domeMat;
+        static int previewId = -1;
+        static float previewUntil;
+
+        /// <summary>Looking at a shield shows its dome faintly for a moment, so the crew sees what it would cover.</summary>
+        public static void Preview(Buildings.Rec b) { previewId = b.Id; previewUntil = Time.realtimeSinceStartup + 0.5f; }
 
         /// <summary>A storm is on its way or here, so shields should be up.</summary>
         public static bool Wanted => Haze.Storm > 0.02f || Haze.Front > 0.02f;
@@ -106,13 +111,13 @@ namespace MarsMod
                 if (b.Type != "shield") continue;
                 var c = Get(b);
                 if (c == null) continue;
-                float target = b.Active ? 1f : 0f;
-                c.Shown = Mathf.MoveTowards(c.Shown, target, dt * 0.6f);
+                float target = b.Active ? 1f : b.Id == previewId && Time.realtimeSinceStartup < previewUntil ? 0.45f : 0f;
+                c.Shown = Mathf.MoveTowards(c.Shown, target, dt * 1.2f);
                 if (c.Shown <= 0.001f) { if (c.Dome != null && c.Dome.activeSelf) c.Dome.SetActive(false); continue; }
                 if (c.Dome == null) c.Dome = MakeDome(c);
                 if (c.Dome == null) continue;
                 if (!c.Dome.activeSelf) c.Dome.SetActive(true);
-                c.Dome.transform.localScale = Vector3.one * (Radius * Mathf.SmoothStep(0.2f, 1f, c.Shown));
+                c.Dome.transform.localScale = Vector3.one * (Radius * Mathf.SmoothStep(0.2f, 1f, Mathf.Clamp01(c.Shown / 0.45f)));
                 var col = new Color(0.45f, 0.85f, 1f, 0.10f * c.Shown);
                 domeMat.color = col;
             }
