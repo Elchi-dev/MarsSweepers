@@ -54,7 +54,13 @@ checking a new game version. All of them are installed in
 
 | 39 | `MoonWorld.CleaningDepthMultiplier(string)` | post | dust tiers: the local player scrubs slower in crust and magnetite sectors |
 
-Hooks 36 to 39 are new in 0.10.0 and have not run in the game yet.
+| 40 | `MoonWorld.RouteEntranceClear(int, int, int)` | post | logic gates (experimental; only installed once a gate exists): outputs that do not fit the rule report blocked |
+
+`EnterMachine` (37) also has a prefix since 0.10.0: with `beltmode on` Mars
+machines take Mars canisters, and the logic gates learn which canister a
+splitter is handling.
+
+Hooks 36 to 40 are new in 0.10.0 and have not run in the game yet.
 
 ## Not hooked, called
 

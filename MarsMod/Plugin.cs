@@ -39,6 +39,7 @@ namespace MarsMod
             Ending.Init();
             Goals.Init();
             Belts.Init();
+            LogicGates.Init();
             Guard.Init();
             SafeMode = Guard.StartupCrashed();
             Guard.Begin("startup");

@@ -60,7 +60,10 @@ plugin). Newest first.
   and cargo put on belts, and `belts` shows what the game says about the
   ports of the nearest Mars building and the conveyor ports of the game's
   definitions. The plan is in docs/BELTS.md. Its first steps are built as
-  an experiment, off by default: `beltmode on` (host).
+  an experiment, off by default: `beltmode on` (host). With it, `gate`
+  next to one of the game's splitters sets a logic gate: by item, by the
+  stock the crew holds (counting canisters on the way, with a low and a
+  high mark) or by market price.
 - MarsSetup is a window now: Install / Play, the patcher download is picked
   up by itself, no terminal. It installs for playing: no MarsProbe and no
   BepInEx console window. `MarsSetup.exe --dev` opens the old tester menu.

@@ -46,6 +46,7 @@ answers from step 1.
    a belt that starts at a port is an output, one that ends there is an
    input.
 4. **Container port** takes every Mars canister into the crew storage.
-5. **Logic gate**, a Mars building on a belt junction: by item, by a stored
+5. **Logic gate** (experimental in 0.10.0: `gate` next to a game splitter;
+   the rule blocks the outputs that do not fit in `RouteEntranceClear`), by item, by a stored
    amount with hysteresis (counting canisters already on their way), or by
    market price.

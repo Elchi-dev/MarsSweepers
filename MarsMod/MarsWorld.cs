@@ -270,6 +270,7 @@ namespace MarsMod
             Goals.Reset(); goalsShown = false;
             Meteors.Reset();
             Belts.Reset();
+            LogicGates.Reset();
             DustDevils.Reset();
             MarketBoards.Reset();
             VanillaBuild.Reset();

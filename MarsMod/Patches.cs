@@ -156,7 +156,22 @@ namespace MarsMod
 
         static bool EnterMachine_Pre(MoonWorld __instance, MoonDepotSnapshot __0, int __2, ref bool __result)
         {
-            try { return !Belts.Enter(__instance, __0, __2, ref __result); } catch { return true; }
+            try { LogicGates.Entering(__0, __2); return !Belts.Enter(__instance, __0, __2, ref __result); } catch { return true; }
+        }
+        static bool gatePatched;
+
+        /// <summary>Logic gates (experimental) hook RouteEntranceClear only once a gate exists, so nobody else pays for it.</summary>
+        public static void EnsureGatePatch()
+        {
+            if (gatePatched || harmony == null) return;
+            gatePatched = true;
+            Patch(AccessTools.Method(typeof(MoonWorld), "RouteEntranceClear", new[] { typeof(int), typeof(int), typeof(int) }), post: nameof(RouteEntranceClear_Post));
+            Plugin.Log.LogMessage("[gates] route hook installed");
+        }
+
+        static void RouteEntranceClear_Post(int __0, int __1, int __2, ref bool __result)
+        {
+            try { LogicGates.RouteCheck(__0, __1, __2, ref __result); } catch { }
         }
         static void EnterMachine_Post(MoonWorld __instance, MoonDepotSnapshot __0, int __1, int __2, bool __result) => BeltResearch.EnterMachine(__instance, __0, __1, __2, __result);
         static void EmitCargo_Post(MoonWorld __instance, MoonConveyorSnapshot __0, string __1, MoonCargo __2, double __3, bool __result) => BeltResearch.EmitCargo(__instance, __0, __1, __2, __3, __result, null);
