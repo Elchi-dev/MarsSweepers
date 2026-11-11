@@ -63,6 +63,12 @@ namespace MarsSetup
         internal static bool GuiIsPatcher(string path) => IsPatcherSource(path);
         internal static void GuiPatcherFrom(string path) { if (game != null) InstallPatcherFrom(path); }
 
+        /// <summary>Everything the window shows also goes to %AppData%\MarsMod\setup.log, for when someone asks for help.</summary>
+        internal static void GuiLog(int kind, string text)
+        {
+            try { Directory.CreateDirectory(settingsDir); File.AppendAllText(Path.Combine(settingsDir, "setup.log"), $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {"HIOWE"[kind]} {text}{Environment.NewLine}"); } catch { }
+        }
+
         internal static void GuiLogError(Exception e)
         {
             try { Directory.CreateDirectory(settingsDir); File.AppendAllText(Path.Combine(settingsDir, "setup-errors.log"), DateTime.Now + " " + e + Environment.NewLine); } catch { }

@@ -58,7 +58,7 @@ namespace MarsSetup
             int y = 12;
             foreach (var l in new[] { gameLabel, bepLabel, patcherLabel, modLabel })
             {
-                l.AutoSize = false; l.Size = new Size(568, 26); l.Location = new Point(12, y); l.ForeColor = Dim; y += 28;
+                l.AutoSize = false; l.AutoEllipsis = true; l.Size = new Size(568, 26); l.Location = new Point(12, y); l.ForeColor = Dim; y += 28;
                 box.Controls.Add(l);
             }
             hint.AutoSize = false; hint.Size = new Size(568, 24); hint.Location = new Point(12, y + 2); hint.ForeColor = Amber;
@@ -91,7 +91,7 @@ namespace MarsSetup
             menu.Items.Add("-");
             menu.Items.Add("Tester tools (console)", null, (s, e) => { try { Process.Start(Application.ExecutablePath, "--dev"); } catch { } });
             more.Click += (s, e) => menu.Show(more, new Point(0, more.Height));
-            var ver = new Label { Text = "v" + Application.ProductVersion, ForeColor = Dim, AutoSize = true, Location = new Point(560, 522) };
+            var ver = new Label { Text = "v" + Application.ProductVersion.Split('+')[0], ForeColor = Dim, AutoSize = true, Location = new Point(560, 522) };
             Controls.Add(ver);
         }
 
@@ -170,13 +170,16 @@ namespace MarsSetup
         public void ShowPatcherWait(bool on)
         {
             if (InvokeRequired) { BeginInvoke((Action)(() => ShowPatcherWait(on))); return; }
-            patcherBtn.Visible = on; cancel.Visible = false;
+            patcherBtn.Visible = on;
+            cancel.Visible = on;
+            if (on) { patcherBtn.Location = new Point(404, 266); patcherBtn.Size = new Size(212, 22); patcherBtn.Font = cancel.Font = new Font("Segoe UI Semibold", 9f, FontStyle.Bold); cancel.Location = new Point(404, 292); cancel.Size = new Size(212, 22); }
         }
 
         public void ShowCancel(bool on)
         {
             if (InvokeRequired) { BeginInvoke((Action)(() => ShowCancel(on))); return; }
-            cancel.Visible = on; if (on) patcherBtn.Visible = false;
+            cancel.Visible = on;
+            if (on) { patcherBtn.Visible = false; cancel.Location = new Point(404, 266); cancel.Size = new Size(212, 48); cancel.Font = new Font("Segoe UI Semibold", 12f, FontStyle.Bold); }
         }
 
         void PickPatcher()
@@ -191,6 +194,7 @@ namespace MarsSetup
         {
             if (IsDisposed) return;
             if (InvokeRequired) { try { BeginInvoke((Action)(() => Write(kind, text))); } catch { } return; }
+            Program.GuiLog(kind, text);
             var c = kind == 0 ? Cyan : kind == 2 ? Good : kind == 3 ? Amber : kind == 4 ? Bad : Text1;
             string prefix = kind == 2 ? "✓ " : kind == 3 ? "! " : kind == 4 ? "✗ " : kind == 0 ? "" : "  ";
             log.SelectionStart = log.TextLength; log.SelectionLength = 0;

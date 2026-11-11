@@ -38,7 +38,9 @@ namespace MarsSetup
                 if (!File.Exists(orig))
                 {
                     if (!File.Exists(dst)) { Err("The game's dstorage.dll is missing. Let Steam verify the game files first."); return false; }
-                    var names = PeExports(File.ReadAllBytes(dst));
+                    List<string> names;
+                    try { names = PeExports(File.ReadAllBytes(dst)); }
+                    catch (Exception e) { Err("The game's dstorage.dll could not be read (" + e.Message + "). Let Steam verify the game files."); return false; }
                     var unknown = names.Where(n => !ForwardedExports.Contains(n)).ToList();
                     if (names.Count == 0 || unknown.Count > 0) { Err("The game's dstorage.dll has functions this route does not forward (" + string.Join(", ", unknown) + "). Not changed."); return false; }
                     File.Move(dst, orig);
@@ -57,7 +59,7 @@ namespace MarsSetup
                     File.WriteAllText(Path.Combine(DoorstopDir, "doorstop_config.ini"), ini, new UTF8Encoding(false));
                     File.WriteAllText(P("doorstop_config.ini"), ini, new UTF8Encoding(false));
                 }
-                Ok("BepInEx starts through dstorage.dll (the game's own file is kept as dstorage_original.dll). [16] undoes it.");
+                Ok(Gui != null ? "BepInEx starts through dstorage.dll (the game's own file is kept)" : "BepInEx starts through dstorage.dll (the game's own file is kept as dstorage_original.dll). [16] undoes it.");
                 return true;
             }
             catch (Exception e) { Err(e.Message); return false; }

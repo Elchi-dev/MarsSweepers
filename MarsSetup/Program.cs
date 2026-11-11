@@ -383,12 +383,17 @@ namespace MarsSetup
             if (!GameRunning()) return true;
             Warn("Moon Sweepers is running. Please close it first.");
             Info(Gui != null ? "Waiting for the game to close…" : "Waiting… (press Esc to cancel)");
+            Installer.Current?.ShowCancel(true);
+            try
+            {
             while (GameRunning())
             {
                 if (Cancel) return false;
                 if (Gui == null && Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Escape) return false;
                 Thread.Sleep(500);
             }
+            }
+            finally { Installer.Current?.ShowCancel(false); }
             Thread.Sleep(1500);
             return true;
         }
