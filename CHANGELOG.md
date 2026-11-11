@@ -3,6 +3,46 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.10.0
+
+### Added
+- Power grid. Buildings that make, store or use power within 25 m of each
+  other form a grid (light poles carry it on). Mars solar panel (8 kW in
+  full sun, a quarter in a storm, nothing at night, less with dust on it),
+  battery (120 kW·min) and fuel generator (burns 1 rocket fuel a minute for
+  30 kW when the grid runs short). Machines on a weak grid slow down; with
+  no power they crawl on backup cells at 20 %. `power` lists every grid.
+- Shield generator. When a storm comes and it has its full 30 kW, it raises
+  a dome. What it covers is a flood fill over the ground (2 m cells, up to
+  28 m, stopped by walls, cliffs and pits). Under the dome the air is clear,
+  dust does not settle on machines and solar panels get full sun.
+- Second production chain: crusher (basalt to grit), fiber spinner (grit to
+  basalt fiber), assembler (iron plates and fiber to machine parts).
+- Water ice mines near the poles, electrolyzer (ice to oxygen and hydrogen)
+  and fuel refinery (hydrogen and oxygen to rocket fuel).
+- Market board: every Mars price and where it is heading; sells from the
+  crew storage, the best-paying material first or everything at once.
+- Item costs: the later machines also take materials from the crew storage
+  when built (the build tool says what is missing).
+- Dust tiers. Sectors hold fine dust, drifts, crust or magnetite crust; the
+  tier pays x1, x1.6, x2.5 or x4 of the normal sector bounty and climbs with
+  the distance from the Collector. The HUD says when the ground changes.
+- Alien trader outposts: three per world. They trade alien alloy for what
+  the crew makes; two offers each, new ones every 8 minutes.
+- The ending: the planet cannon (alien alloy, machine parts, 30 rocket fuel,
+  60 kW) fires at the Moon. The game's own ending sequence plays with the
+  Moon in the sky. `ending` plays it right away (host, cheat).
+- Blender models and build cards for all new buildings, the ice mine and
+  the outpost.
+- MarsSetup is a window now: Install / Play, the patcher download is picked
+  up by itself, no terminal. It installs for playing: no MarsProbe and no
+  BepInEx console window. `MarsSetup.exe --dev` opens the old tester menu.
+
+### Changed
+- Every Mars building is driven by its catalogue entry (MarsItems.cs):
+  one place for prices, recipes, power and item costs.
+- Removing all modding also puts the game's own dstorage.dll back.
+
 ## 0.9.16
 
 ### Fixed

@@ -77,27 +77,33 @@ Everything follows from that:
 | **The planet** | Terrain profile 3: a home valley that keeps the spawn crater and a walkable rim, Mars landforms and colours |
 | **The air** | A sky dome and fog shells, haze per world, Phobos, morning start |
 | **Dust storms** | A schedule per world seed, a 75 second warning with a front you can see, wind, sound and an alarm. Walls and roofs keep them out |
-| **Mines** | A home mine next to the base and 36 more from the seed. They never run out |
-| **Machines** | Ore drill, Smelter, Container port, Light pole, in the game's build menu with their own cards, made in Blender in the game's style |
+| **Mines** | A home mine next to the base and 36 more from the seed, water ice near the poles. They never run out |
+| **Machines** | Ore drill, smelter, crusher, fiber spinner, assembler, electrolyzer, fuel refinery, container port, market board, in the game's build menu with their own cards, made in Blender in the game's style |
+| **Power** | Solar panels (weak in storms), batteries, fuel generators, light poles that carry power; grids form by themselves |
+| **Shields** | A shield generator raises a dome when a storm comes; the covered ground is found by flood fill |
+| **Dust tiers** | Sectors pay x1 to x4 of the normal bounty, more the further you go |
+| **Aliens** | Three trader outposts per world, alien alloy for what the crew makes |
+| **The ending** | The planet cannon fires at the Moon, with the game's own ending sequence |
 | **Storage** | A Mars backpack per player and crew storage that can be sold |
 | **Market** | Prices that move, booms and crashes, a ticker; selling a lot lowers your price |
 | **Storm work** | Storms jam machines that stand outside; scrub them by hand. Light poles clear the air around them |
 | **Co-op** | Its own Steam channel, per-world Mars data, the host decides, the crew follows |
 | **Dev terminal** | Ctrl+Shift+K: storms, haze, time, teleport, fly, models, research, test money |
-| **MarsSetup** | One `.exe`: installs BepInEx and the mod, runs a guided test, zips a report |
+| **MarsSetup** | One `.exe` with a window: Install, Play. Testers start it with `--dev` for the guided test and the report |
 | **MarsProbe** | Reads the game: types, scenes, definitions, call traces |
 
 ---
 
 ## A quick look
 
-1. Run `MarsSetup.exe` and pick your Moon Sweepers folder (it finds the
-   Steam one by itself).
+1. Run `MarsSetup.exe` and press **Install** (it finds the Steam game by
+   itself). Once, it sends you to Nexus Mods for the patcher the game needs;
+   the download is picked up by itself. Then press **Play**.
 2. Start the game, pick an empty slot, choose **Mars**.
 3. In the world: Ctrl+Shift+K opens the terminal, `help` lists the commands.
    `money` gives $10,000 for testing, `tp mine` takes you to the nearest mine.
-4. Take out the build tool: the Ore drill and Smelter are under Production,
-   the Container port under Logistics.
+4. Take out the build tool: machines are under Production, the container
+   port and market board under Logistics, power and shields under Power.
 
 Building from source: [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -106,9 +112,8 @@ Building from source: [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Planned
 
 Belts carrying Mars materials (any side of a machine is input or output,
-the belt decides), a container port fed by belts, a logic gate you set up
-by looking at it, dust tiers, power, shield generators, the ending where a clean
-Mars takes care of the Moon, and alien traders.
+the belt decides), a container port fed by belts, and a logic gate you set
+up by looking at it.
 [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---
@@ -136,7 +141,8 @@ BepInEx 6 be.791.
 
 Built, not played yet: mines and machines (0.7.0), the machines in the
 game's build tool with the save side file (0.8.0), storm jams, light poles
-and the market (0.9.0). Not tested at all: a
+and the market (0.9.0), power, shields, the second chain, ice and fuel,
+dust tiers, aliens, the ending and the setup window (0.10.0). Not tested at all: a
 second player with machines, Linux under Wine or Proton.
 
 ---

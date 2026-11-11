@@ -5,35 +5,29 @@ Sweepers: Mars is larger, dirtier and needs real industry.
 
 ## Next
 
-1. **Test 0.8 in the game**, alone and with a second player: cards, the
-   ghost, saving and loading, the crew sync of kinds above 192.
-2. **Balance.** Read the upgrade tree (prices and effects) and how section
-   money grows, model what a team earns per minute at each stage, and place
-   Mars after the Moon on that curve. Base values: $1 per kg, sand 3x, stone
-   7x, $10 per cleaned section; machines cost $40 to $1000.
-3. **Belts.** The game's conveyors carry Mars items. Any side of a machine
+1. **Test 0.10 in the game**: power, the shield dome, the new machines and
+   their models, ice mines, the alien outposts, the ending, the setup
+   window on a clean PC.
+2. **Belts.** The game's conveyors carry Mars items. Any side of a machine
    can be input or output, the belt's direction decides.
-4. **Container port fed by belts.** Accepts only Mars materials and stores
+3. **Container port fed by belts.** Accepts only Mars materials and stores
    them for the crew (building, crafting, selling).
-5. **Logic gate.** A belt splitter you set up by looking at it: left or right
+4. **Logic gate.** A belt splitter you set up by looking at it: left or right
    depending on the item, a stored amount (counting items already on their
    way, with a gap so it does not flip every item) or a market price.
+5. **Balance** after the first play sessions (docs/BALANCE.md has the model).
 
-Done in 0.9.0: the market (prices that move, booms, crashes, a ticker),
-storms jamming machines with scrubbing by hand, light poles.
+Done in 0.9.0: the market, storm jams with scrubbing by hand, light poles.
+Done in 0.10.0: power, shields, the second chain, ice and rocket fuel, the
+market board, item costs, dust tiers, alien traders, the ending, the setup
+window.
 
 ## Later
 
-- Dust tiers per sector: dearer dust takes longer to scrub.
+- Thicker dust in higher tiers (today the tier is only the reward).
 - Storms jam belts too; scrubbing gets faster with upgrades.
-- Power: solar is weak in storms, batteries, a storm-proof generator.
-- A market board building, and gates that read prices.
-- Shield generators: a lot of power, only on when a storm is near, the
-  covered area found by flood fill so nothing gets through; the base too.
-- Advanced machines and shields cost Mars products, not only money.
-- The ending: a clean Mars reflects the sun onto the cleaned Moon, using the
-  game's own ending.
-- Alien traders (design open).
+- Gates that read prices from the market board.
+- More alien offers, and outposts that move after a while.
 
 ## The shared standard
 
