@@ -18,16 +18,16 @@ Sweepers: Mars is larger, dirtier and needs real industry.
 5. **Logic gate.** A belt splitter you set up by looking at it: left or right
    depending on the item, a stored amount (counting items already on their
    way, with a gap so it does not flip every item) or a market price.
-6. **Market.** Prices that move (drift, booms, crashes, selling a lot lowers
-   your own price), shown on a board and in the HUD, readable by gates.
+
+Done in 0.9.0: the market (prices that move, booms, crashes, a ticker),
+storms jamming machines with scrubbing by hand, light poles.
 
 ## Later
 
 - Dust tiers per sector: dearer dust takes longer to scrub.
-- Storms jam belts and machines; cleaning them by hand takes a few seconds
-  (faster with upgrades).
+- Storms jam belts too; scrubbing gets faster with upgrades.
 - Power: solar is weak in storms, batteries, a storm-proof generator.
-- Light poles: an early safe zone in a storm.
+- A market board building, and gates that read prices.
 - Shield generators: a lot of power, only on when a storm is near, the
   covered area found by flood fill so nothing gets through; the base too.
 - Advanced machines and shields cost Mars products, not only money.

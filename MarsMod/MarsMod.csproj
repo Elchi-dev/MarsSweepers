@@ -8,7 +8,7 @@
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version>0.8.1</Version>
+    <Version>0.9.0</Version>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <NoWarn>CS0618;CS8632;MSB3277</NoWarn>
   </PropertyGroup>

@@ -78,8 +78,10 @@ Everything follows from that:
 | **The air** | A sky dome and fog shells, haze per world, Phobos, morning start |
 | **Dust storms** | A schedule per world seed, a 75 second warning with a front you can see, wind, sound and an alarm. Walls and roofs keep them out |
 | **Mines** | A home mine next to the base and 36 more from the seed. They never run out |
-| **Machines** | Ore drill, Smelter, Container port, in the game's build menu with their own cards, made in Blender in the game's style |
+| **Machines** | Ore drill, Smelter, Container port, Light pole, in the game's build menu with their own cards, made in Blender in the game's style |
 | **Storage** | A Mars backpack per player and crew storage that can be sold |
+| **Market** | Prices that move, booms and crashes, a ticker; selling a lot lowers your price |
+| **Storm work** | Storms jam machines that stand outside; scrub them by hand. Light poles clear the air around them |
 | **Co-op** | Its own Steam channel, per-world Mars data, the host decides, the crew follows |
 | **Dev terminal** | Ctrl+Shift+K: storms, haze, time, teleport, fly, models, research, test money |
 | **MarsSetup** | One `.exe`: installs BepInEx and the mod, runs a guided test, zips a report |
@@ -105,8 +107,7 @@ Building from source: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Belts carrying Mars materials (any side of a machine is input or output,
 the belt decides), a container port fed by belts, a logic gate you set up
-by looking at it, a market with moving prices, dust tiers, storms that jam
-machines, power, light poles, shield generators, the ending where a clean
+by looking at it, dust tiers, power, shield generators, the ending where a clean
 Mars takes care of the Moon, and alien traders.
 [docs/ROADMAP.md](docs/ROADMAP.md)
 
@@ -133,8 +134,9 @@ the air, storms (indoors and out), the map, the contract, the logo, the
 poster, the terminal, the narrator, the drill model, on Windows with
 BepInEx 6 be.791.
 
-Built, not played yet: mines and machines (0.7.0), and the machines in the
-game's build tool with the save side file (0.8.0). Not tested at all: a
+Built, not played yet: mines and machines (0.7.0), the machines in the
+game's build tool with the save side file (0.8.0), storm jams, light poles
+and the market (0.9.0). Not tested at all: a
 second player with machines, Linux under Wine or Proton.
 
 ---

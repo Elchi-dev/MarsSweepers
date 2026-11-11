@@ -101,7 +101,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.8.1   ");
+                                                 |_|   setup v0.9.0   ");
             Console.ResetColor();
         }
 
@@ -650,17 +650,16 @@ namespace MarsSetup
             }
 
             Console.WriteLine();
-            Head("Mars 0.8.1 test");
-            Info(" A. Balance numbers (2 minutes): load your MOON world, open the terminal (Ctrl+Shift+K), type");
-            Info("    'economy', then just play a bit. The mod quietly notes money, cleaned sections and upgrades.");
-            Info(" B. Load your Mars world, 'money' gives $10,000, 'tp mine' takes you to a mine.");
-            Info(" C. Build tool (hammer), build menu: Ore drill and Smelter under Production, Container port under");
-            Info("    Logistics. Put the drill ON the mine (elsewhere the ghost stays red and says why).");
-            Info(" D. E on the drill takes ore, E on the smelter loads ore / takes plates, E on the container stores,");
-            Info("    Shift+E sells. Remove one with the build tool: you get the money back.");
-            Info(" E. Save, quit to the menu, load the Mars world again: are the machines still there? Then a Moon");
-            Info("    world: no Mars cards in its build menu. With a second player: do they see, build and use them?");
-            Info(" F. Quit the game. I'll build the report.");
+            Head("Mars 0.9 test");
+            Info(" 1. Load your Mars world. Terminal (Ctrl+Shift+K): 'money' gives $10,000, 'tp mine' finds a mine.");
+            Info(" 2. Build tool (hammer), build menu: Ore drill and Smelter (Production), Container port (Logistics),");
+            Info("    Light pole (Services). The drill goes ON a mine. E uses a machine, Shift+E the second action.");
+            Info(" 3. 'storm now': machines standing outside fill up with dust and jam. Hold E on one to scrub it.");
+            Info("    Stand next to a light pole in the storm: the air clears up around it. At night its lamp is on.");
+            Info(" 4. The market ticker at the top: prices move every 20 s, sometimes a boom or a crash. 'market'");
+            Info("    shows more. The container port's Shift+E sells at the market price; sell a lot and it drops.");
+            Info(" 5. Save, quit, load again: machines still there? A Moon world: no Mars cards. Play it together!");
+            Info(" 6. For balancing later: in a MOON world type 'economy' once. Then quit, I'll build the report.");
             Info("Screenshots are very welcome, especially of the intro, the sky and a storm!");
             Console.WriteLine();
             var start = DateTime.Now;

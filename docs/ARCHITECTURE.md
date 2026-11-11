@@ -30,7 +30,7 @@ MarsWorld.Frame
    '-- in a Mars world:
          look and air       Look, Sky, Haze, Wind, Shelter, Dust
          network            MarsNet (Steam channel 7), MarsData (per-world JSON)
-         gameplay           Mines, Buildings, VanillaBuild, BuildMode
+         gameplay           Mines, Buildings, VanillaBuild, BuildMode, Market, LightPoles
          tools              Terminal, Commands, Research
 ```
 
@@ -59,7 +59,10 @@ A Moon world never runs the Mars parts: every feature checks
 | `MarsItems.cs` | Items and the building catalogue |
 | `Buildings.cs` | Machine state, production, backpacks, crew storage, requests to the host |
 | `VanillaBuild.cs` | Mars machines as game building kinds, cards, placement rules, the save side file |
-| `BuildMode.cs` | Using machines (E), the HUD, and the fallback N menu |
+| `BuildMode.cs` | Using machines (E, hold to scrub), the HUD, and the fallback N menu |
+| `Market.cs` | Moving prices, booms and crashes, selling pressure, the ticker |
+| `LightPoles.cs` | Pole lamps and the clear air around them |
+| `Economy.cs` | The economy log and the `economy` dump, for balancing |
 | `Terminal.cs`, `Commands.cs` | The dev terminal (Ctrl+Shift+K) and its commands |
 | `Research.cs` | The `research` command and PNG helpers |
 | `MarsUi.cs`, `Structs.cs`, `Reflect.cs` | Small helpers |

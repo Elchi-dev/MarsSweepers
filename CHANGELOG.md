@@ -3,6 +3,25 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.0
+
+### Added
+- Storms jam machines: during a storm, dust builds up on drills and
+  smelters that stand outside (a roof protects them). A dusty machine runs
+  slower, a full one stops. Hold the interact key on it for 3.5 s to scrub
+  it clean.
+- Light pole ($60, Services): a lamp that turns on at night and in storms,
+  and the storm air clears up within about 20 m of it, so a line of poles
+  makes a path home. New Blender model.
+- The Mars market: prices drift every 20 s and are pulled back towards
+  normal, a boom or a crash hits one material every 13 minutes or so for a
+  few minutes, and selling a lot lowers the price for a while. A ticker at
+  the top of the screen (`MarketTicker` in the settings turns it off), the
+  `market` command, and the container port sells at market prices.
+
+### Verified
+- Builds. Not run in the game yet.
+
 ## 0.8.1
 
 ### Added
