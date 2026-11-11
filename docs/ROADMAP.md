@@ -15,7 +15,9 @@ Sweepers: Mars is larger, dirtier and needs real industry.
    them for the crew (building, crafting, selling).
 4. **Logic gate.** A belt splitter you set up by looking at it: left or right
    depending on the item, a stored amount (counting items already on their
-   way, with a gap so it does not flip every item) or a market price.
+   way, with a gap so it does not flip every item) or a market price. Built
+   as an experiment in 0.10.0 (`gate` in the terminal); next: a gate
+   building with its own card once the belt test shows how splitters route.
 5. **Balance** after the first play sessions (docs/BALANCE.md has the model).
 
 Done in 0.9.0: the market, storm jams with scrubbing by hand, light poles.
