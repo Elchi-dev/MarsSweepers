@@ -110,7 +110,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.7   ");
+                                                 |_|   setup v0.9.8   ");
             Console.ResetColor();
         }
 
@@ -284,7 +284,9 @@ namespace MarsSetup
             var list = new List<string>();
             try
             {
-                if (!File.Exists(P("winhttp.dll"))) list.Add("winhttp.dll is missing from the game folder: BepInEx cannot start. Pick [1].");
+                bool viaVersion = File.Exists(P("winhttp.dll.off")) && File.Exists(P("version.dll"));
+                if (viaVersion) list.Add("BepInEx is set to start through version.dll ([10]); [11] switches back to winhttp.dll.");
+                else if (!File.Exists(P("winhttp.dll"))) list.Add("winhttp.dll is missing from the game folder: BepInEx cannot start. Pick [1].");
                 string ini = P("doorstop_config.ini");
                 if (File.Exists(ini) && Regex.IsMatch(File.ReadAllText(ini), @"(?im)^\s*enabled\s*=\s*false")) list.Add("doorstop_config.ini has 'enabled = false': BepInEx is switched off. Pick [1] to switch it on again.");
                 if (!File.Exists(P("dotnet", "coreclr.dll"))) list.Add("dotnet\\coreclr.dll is missing: BepInEx cannot start. Pick [1].");
@@ -775,7 +777,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.7: one test round for everything");
+            Head("Mars 0.9.8: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
@@ -847,6 +849,15 @@ namespace MarsSetup
                             Add(f, "MarsSessions/" + f.Substring(MarsSaveDir.Length + 1));
                     }
                 Add(Path.Combine(SaveDir, "Player-prev.log"), "UnityPlayer/Player-prev.log");
+                try
+                {
+                    string crashes = Path.Combine(Path.GetTempPath(), "DragDropGames", "MoonSweepers", "Crashes");
+                    if (Directory.Exists(crashes))
+                        foreach (var dir in Directory.GetDirectories(crashes).OrderByDescending(Directory.GetLastWriteTime).Take(3))
+                            foreach (var f in Directory.GetFiles(dir).Where(f => !f.EndsWith(".dmp", StringComparison.OrdinalIgnoreCase) || new FileInfo(f).Length < 4_000_000))
+                                Add(f, "Crashes/" + Path.GetFileName(dir) + "/" + Path.GetFileName(f));
+                }
+                catch { }
 
                 // The game's own interop assemblies: the C# view of the game's classes (no game code, only signatures).
                 string[] skip = { "UnityEngine", "Il2Cppmscorlib", "Il2CppSystem", "Il2CppMono", "System", "mscorlib", "netstandard", "Unity." };

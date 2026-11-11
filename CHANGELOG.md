@@ -3,6 +3,15 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.8
+
+### Fixed
+- Diagnosis: modules are read every second for 20 s, and the last list a
+  process had is kept when it exits early (a start that ended within 3 s
+  left nothing). The status no longer says winhttp.dll is missing when
+  BepInEx is set to start through version.dll. The report includes the
+  game's crash folders.
+
 ## 0.9.7
 
 ### Added

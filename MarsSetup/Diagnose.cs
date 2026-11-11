@@ -223,38 +223,47 @@ namespace MarsSetup
             static void Modules(int pid)
             {
                 // Look early and again later: winhttp.dll is loaded within the first seconds, BepInEx's runtime soon after.
-                foreach (int wait in new[] { 3000, 5000, 7000 })
+                // Every second for 20 s: a start that dies early still leaves its last module list behind.
+                for (int i = 0; i < 20; i++)
                 {
-                    Thread.Sleep(wait);
-                    if (!ModulesOnce(pid)) return;
+                    Thread.Sleep(i == 0 ? 700 : 1000);
+                    if (!ModulesOnce(pid, i == 19 || i == 2)) { if (lastMods.TryGetValue(pid, out var last)) Dump(pid, last, "last seen before it exited"); return; }
                 }
             }
 
-            static readonly HashSet<int> listed = new HashSet<int>();
+            static readonly HashSet<string> listed = new HashSet<string>();
 
-            static bool ModulesOnce(int pid)
+            /// <summary>All modules in load order: whatever loaded Windows' winhttp.dll before the game asked for it shows up before it.</summary>
+            static void Dump(int pid, List<string> mods, string when)
+            {
+                string key = pid + "/" + mods.Count;
+                if (!listed.Add(key)) return;
+                string win32 = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                L($"process {pid} modules ({when}, {mods.Count}):");
+                int i = 0;
+                foreach (var m in mods)
+                {
+                    string where = m.StartsWith(game, StringComparison.OrdinalIgnoreCase) ? "game: " + m.Substring(game.Length).TrimStart('\\')
+                                 : m.StartsWith(win32, StringComparison.OrdinalIgnoreCase) ? "windows: " + m.Substring(win32.Length).TrimStart('\\')
+                                 : "OTHER: " + m;
+                    L($"process {pid} module {i++:00}: {where}");
+                }
+            }
+
+            static readonly Dictionary<int, List<string>> lastMods = new Dictionary<int, List<string>>();
+
+            static bool ModulesOnce(int pid, bool report)
             {
                 try
                 {
                     var p = Process.GetProcessById(pid);
                     var mods = p.Modules.Cast<ProcessModule>().Select(m => m.FileName).ToList();
+                    lastMods[pid] = mods;
+                    if (!report) return true;
                     string win = mods.FirstOrDefault(m => Path.GetFileName(m).Equals("winhttp.dll", StringComparison.OrdinalIgnoreCase));
                     string clr = mods.FirstOrDefault(m => Path.GetFileName(m).Equals("coreclr.dll", StringComparison.OrdinalIgnoreCase));
                     L($"process {pid}: winhttp.dll loaded from {(win ?? "nowhere")}; coreclr.dll {(clr ?? "NOT loaded (BepInEx's .NET did not start)")}; {mods.Count} modules");
-                    // Modules come in load order. Whatever loaded Windows' winhttp.dll before the game asked for it shows up here.
-                    if (!listed.Contains(pid))
-                    {
-                        listed.Add(pid);
-                        string win32 = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                        int i = 0;
-                        foreach (var m in mods)
-                        {
-                            string where = m.StartsWith(game, StringComparison.OrdinalIgnoreCase) ? "game: " + m.Substring(game.Length).TrimStart('\\')
-                                         : m.StartsWith(win32, StringComparison.OrdinalIgnoreCase) ? "windows: " + m.Substring(win32.Length).TrimStart('\\')
-                                         : "OTHER: " + m;
-                            L($"process {pid} module {i++:00}: {where}");
-                        }
-                    }
+                    Dump(pid, mods, "loaded");
                     return true;
                 }
                 catch (Exception e) { L($"process {pid}: modules unreadable ({e.Message}), it may have exited (Steam restarts games it did not start itself)"); return false; }
