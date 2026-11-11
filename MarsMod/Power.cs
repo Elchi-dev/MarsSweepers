@@ -82,10 +82,14 @@ namespace MarsMod
                 // A shield only draws when the grid can carry it fully; otherwise it stays off and takes nothing.
                 var unpowered = new List<Buildings.Rec>();
                 {
-                    float avail = make + batteries.Sum(x => x.r.Energy) / Mathf.Max(dtm, 1e-4f) - use;
+                    float stored0 = batteries.Sum(x => x.r.Energy), cap0 = batteries.Sum(x => x.d.Battery);
+                    float avail = make + stored0 / Mathf.Max(dtm, 1e-4f) - use;
+                    // A shield that is down only comes up with spare power or batteries at least 10 % full, so it does not flicker.
+                    float availToStart = make - use + (cap0 > 0 && stored0 >= cap0 * 0.1f ? stored0 / Mathf.Max(dtm, 1e-4f) : 0f);
                     foreach (var (r, d) in shields)
                     {
-                        if (avail >= d.PowerUse) { use += d.PowerUse; avail -= d.PowerUse; }
+                        float a = r.Active ? avail : Mathf.Min(avail, availToStart);
+                        if (a >= d.PowerUse) { use += d.PowerUse; avail -= d.PowerUse; availToStart -= d.PowerUse; }
                         else unpowered.Add(r);
                     }
                 }
