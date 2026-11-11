@@ -38,6 +38,16 @@ PALETTE = {
     "mars:furnace glow":            ((1.0, 0.45, 0.12), 0.0, 0.4, ((1.0, 0.42, 0.08), 6.0)),
     "mars:iron plate":              ((0.62, 0.64, 0.67), 0.9, 0.3, None),
     "mars:lamp":                    ((1.0, 0.93, 0.80), 0.0, 0.3, ((1.0, 0.90, 0.72), 9.0)),
+    "mars:ice":                     ((0.78, 0.90, 0.97), 0.0, 0.12, None),
+    "mars:ice blue":                ((0.42, 0.68, 0.86), 0.0, 0.10, None),
+    "mars:frost":                   ((0.93, 0.95, 0.97), 0.0, 0.55, None),
+    "mars:solar cell":              ((0.05, 0.10, 0.22), 0.4, 0.15, None),
+    "mars:fiber":                   ((0.36, 0.33, 0.30), 0.2, 0.55, None),
+    "mars:alloy":                   ((0.55, 0.30, 0.85), 0.9, 0.2, ((0.55, 0.25, 0.95), 1.2)),
+    "mars:shield":                  ((0.35, 0.85, 1.0), 0.0, 0.1, ((0.35, 0.85, 1.0), 8.0)),
+    "mars:hydrogen":                ((1.0, 0.55, 0.15), 0.0, 0.3, ((1.0, 0.5, 0.1), 2.5)),
+    "mars:alien shell":             ((0.52, 0.46, 0.60), 0.35, 0.22, None),
+    "mars:alien dark":              ((0.16, 0.13, 0.22), 0.5, 0.3, None),
     "mars:screen":                  ((0.06, 0.20, 0.26), 0.0, 0.2, ((0.206, 0.722, 0.854), 1.6)),
 }
 
@@ -289,4 +299,46 @@ def save_and_preview(out, target, dist, root_name, views=((35, 28), (215, 22), (
     export_glb(out + ".glb")
     for o in bpy.context.scene.objects:
         if o.name.startswith("COL_"): o.hide_set(True)
-    preview(out + "_preview", target=target, dist=dist, views=views)
+    import os
+    if os.environ.get("MARS_NO_PREVIEW"): return
+    if os.environ.get("MARS_ONE_VIEW"): views = views[:1]
+    preview(out + "_preview", target=target, dist=dist, views=views, samples=int(os.environ.get("MARS_SAMPLES", "48")))
+
+
+def spin_group(name, objs, centre=None):
+    """Everything in objs turns around the up axis in game while the machine runs."""
+    from mathutils import Vector
+    bpy.context.view_layer.update()
+    pts = [o.matrix_world @ Vector(c) for o in objs for c in o.bound_box]
+    lo = Vector((min(p.x for p in pts), min(p.y for p in pts), 0)); hi = Vector((max(p.x for p in pts), max(p.y for p in pts), 0))
+    c = (lo + hi) / 2 if centre is None else Vector((centre[0], centre[1], 0))
+    anim = bpy.data.objects.new("anim_spin_" + name, None); bpy.context.scene.collection.objects.link(anim)
+    anim.location = (c.x, c.y, 0.0)          # turns around its own centre line, not the model's origin
+    bpy.context.view_layer.update()
+    inv = anim.matrix_world.inverted()
+    for o in objs:
+        o.parent = anim
+        o.matrix_parent_inverse = inv
+    return anim
+
+def ports(w, d, z=0.85, sides=((0, -1), (1, 0), (0, 1), (-1, 0)), front_x=0.0):
+    """Game conveyor ports on the given sides of a w x d machine, with port_<i> markers for belts."""
+    from mathutils import Vector
+    for i, (dx, dy) in enumerate(sides):
+        o = Vector((dx, dy, 0)); yaw = math.atan2(dy, dx) - math.pi / 2
+        face = Vector((dx * (w / 2 - 0.25), dy * (d / 2 - 0.25), z))
+        if (dx, dy) == (0, -1): face.x = front_x
+        box(f"port block {i}", (1.3, 0.6, 1.1) if dy else (0.6, 1.3, 1.1), face - o * 0.35 + Vector((0, 0, -0.03)), "MC - Graphite chassis", bevel=0.05)
+        conveyor_port(f"port {i}", face, o, yaw)
+        empty(f"port_{i}", face + o * 0.2, (dx, dy, 0))
+
+def base(w, d, h=0.2, chamfer=0.5):
+    """The standard machine plinth: graphite slab, tangerine lip, deck, cyan edge lights."""
+    chamfer_plinth("plinth", w, d, h, chamfer, 0.0, "MC - Graphite chassis")
+    chamfer_plinth("plinth lip", w + 0.04, d + 0.04, 0.05, chamfer + 0.01, h, "MC - Tangerine safety trim")
+    chamfer_plinth("deck", w - 0.06, d - 0.06, 0.08, chamfer - 0.02, h + 0.05, "MC - Graphite chassis")
+    plinth_edge_lights("edge light", w + 0.04, d + 0.04, chamfer + 0.01, 0.07)
+
+IV, GR, OR, CY, RB, HW = ("MC - Porcelain ivory polymer", "MC - Graphite chassis", "MC - Tangerine safety trim",
+                          "MC - Cyan frosted diffuser", "MC - Rubber panel seals", "Solar - Brushed hardware")
+GLASS, DARK = "collectorbluelaminatedglass", "collectorintakedarkness"
