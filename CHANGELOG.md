@@ -3,6 +3,16 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.5
+
+### Added
+- Setup diagnosis (option 9, and on every game start the setup makes):
+  which game processes ran, with their command line and parent; whether
+  each one loaded BepInEx's winhttp.dll from the game folder and BepInEx's
+  .NET runtime; every loader file compared byte for byte with BepInEx
+  be.791; Smart App Control, Code Integrity blocks and Defender detections
+  about the game folder. All of it goes into the report.
+
 ## 0.9.4
 
 ### Fixed
