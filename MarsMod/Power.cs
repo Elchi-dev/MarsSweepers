@@ -57,12 +57,14 @@ namespace MarsMod
                 float make = 0f, use = 0f;
                 var batteries = new List<(Buildings.Rec r, Def d)>();
                 var gens = new List<(Buildings.Rec r, Def d)>();
+                var shields = new List<(Buildings.Rec r, Def d)>();
                 foreach (var n in g.Nodes)
                 {
                     var d = Get(n.Type);
                     if (d.Role == Role.Solar) make += SolarNow(n, d);
                     if (d.Role == Role.Battery) batteries.Add((n, d));
                     if (d.Role == Role.Generator) gens.Add((n, d));
+                    if (d.Role == Role.Shield) { if (Machines.Busy(n, d)) shields.Add((n, d)); continue; }
                     if (d.PowerUse > 0 && Machines.Busy(n, d)) use += d.PowerUse;
                 }
                 float stored = batteries.Sum(x => x.r.Energy), cap = batteries.Sum(x => x.d.Battery);
@@ -76,6 +78,16 @@ namespace MarsMod
                         r.Burn = d.Seconds;
                     }
                     if (r.Burn > 0f) { make += d.PowerMake; r.Burn = Mathf.Max(0f, r.Burn - dt); }
+                }
+                // A shield only draws when the grid can carry it fully; otherwise it stays off and takes nothing.
+                var unpowered = new List<Buildings.Rec>();
+                {
+                    float avail = make + batteries.Sum(x => x.r.Energy) / Mathf.Max(dtm, 1e-4f) - use;
+                    foreach (var (r, d) in shields)
+                    {
+                        if (avail >= d.PowerUse) { use += d.PowerUse; avail -= d.PowerUse; }
+                        else unpowered.Add(r);
+                    }
                 }
                 float supply;
                 if (make >= use)
@@ -103,6 +115,7 @@ namespace MarsMod
                 }
                 g.Make = make; g.Use = use; g.Stored = batteries.Sum(x => x.r.Energy); g.Capacity = cap;
                 foreach (var n in g.Nodes) n.Supply = supply;
+                foreach (var r in unpowered) r.Supply = 0f;
             }
             // Consumers with no grid at all.
             foreach (var r in recs)
