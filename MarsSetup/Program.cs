@@ -111,7 +111,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.9   ");
+                                                 |_|   setup v0.9.10  ");
             Console.ResetColor();
         }
 
@@ -780,7 +780,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.9: one test round for everything");
+            Head("Mars 0.9.10: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");

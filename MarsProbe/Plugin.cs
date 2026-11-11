@@ -24,8 +24,10 @@ namespace MarsProbe
         public override void Load()
         {
             Log = base.Log;
-            TracerEnabled = Config.Bind("Tracer", "Enabled", true, "Count calls to event-like game methods (Sell, Save, Build…). Turn off if the game gets slow.");
-            TracerMax = Config.Bind("Tracer", "MaxMethods", 320, "How many game methods the tracer may patch at most.");
+            // Off by default since 2026-11-11: on 2026-11-10 a start died 4 s in, right after the tracer patched 200 game
+            // methods, and Windows then attached a compatibility fix to the game that kept BepInEx out.
+            TracerEnabled = Config.Bind("Tracer", "On", false, "Count calls to event-like game methods (Sell, Save, Build…). Research only: it patches hundreds of game methods and once crashed the game at startup.");
+            TracerMax = Config.Bind("Tracer", "MaxMethods", 200, "How many game methods the tracer may patch at most.");
             AutoSnapshots = Config.Bind("Snapshots", "Auto", true, "Take snapshots automatically at the main menu and after a world loads.");
             Config.Save();
 

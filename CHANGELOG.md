@@ -3,6 +3,15 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.10
+
+### Fixed
+- MarsProbe's tracer is off by default (new setting `Tracer.On`). The last
+  BepInEx start on the affected PC (2026-11-10 04:13:30) ended 4 s in,
+  right after the tracer had patched 200 game methods; every start after it
+  ran with Windows' shim engine loaded and Windows' own winhttp.dll and
+  version.dll, so BepInEx never started again.
+
 ## 0.9.9
 
 ### Fixed
