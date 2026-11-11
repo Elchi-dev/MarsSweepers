@@ -34,6 +34,9 @@ plugin). Newest first.
   Moon in the sky. `ending` plays it right away (host, cheat).
 - Blender models and build cards for all new buildings, the ice mine and
   the outpost.
+- Belt research: passive hooks log the first canisters entering machines
+  and cargo put on belts, and `belts` shows what the game says about the
+  ports of the nearest Mars building. The plan is in docs/BELTS.md.
 - MarsSetup is a window now: Install / Play, the patcher download is picked
   up by itself, no terminal. It installs for playing: no MarsProbe and no
   BepInEx console window. `MarsSetup.exe --dev` opens the old tester menu.

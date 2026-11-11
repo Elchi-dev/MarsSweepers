@@ -28,6 +28,7 @@ namespace MarsMod
             ("unlock", "CHEAT: buy every upgrade in the upgrade tree for free"),
             ("give <item> [count]", "CHEAT: put Mars items in your backpack (give alone lists them)"),
             ("power", "every power grid: what it makes, uses and stores"),
+            ("belts", "research: belts near you and what the game says about the nearest Mars building's ports"),
             ("ending", "CHEAT (host): play the Mars ending now, the Moon in the sky gets it"),
             ("freebuild [on|off] | fastmachines <x>", "CHEAT: Mars buildings cost nothing / machines run x times faster"),
             ("build <id> | buildings", "place a Mars building directly / list all of them"),
@@ -102,6 +103,7 @@ namespace MarsMod
                     foreach (var l in VanillaBuild.Status()) say(l);
                     break;
                 case "ending": if (!MarsNet.IsHost) { say("Only the host can start the ending."); break; } Ending.Fire(); say("Ending in " + Ending.Countdown + " s (cheat: no cannon needed)."); break;
+                case "belts": { var w0 = FindWalker(); foreach (var l in BeltResearch.Report(w0 != null ? w0.transform.position : Vector3.zero)) say(l); break; }
                 case "power": foreach (var l in Power.Report()) say(l); break;
                 case "mines":
                 {

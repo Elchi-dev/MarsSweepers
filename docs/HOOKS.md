@@ -48,12 +48,18 @@ checking a new game version. All of them are installed in
 | 27 | `MoonFramePacer.Update` | post | same, whichever runs (deduplicated per frame) |
 | 28 to 35 | `MoonMainMenu.StartGame`, `ClickSlot`, `ReadyOrStart`, `MoonSteamLobby.Create`, `StartShift`, `EnterShift`, `MoonSession.Load`, `ReturnToMenu` | post | diagnostics only: log the start flow |
 
-Hooks 18 to 25 are new in 0.8.0 and have not run in the game yet.
+| 36 | `MoonWorld.PaySection(int, string)` | pre + post | dust tiers: reads the bounty the game paid, adds the tier bonus (host, Mars only) |
+| 37 | `MoonWorld.EnterMachine(MoonDepotSnapshot, int, int)` | post | belt research: logs the first 40 canisters entering machines |
+| 38 | `MoonWorld.EmitCargo(MoonConveyorSnapshot, string, MoonCargo, double, out string)` | post | belt research: logs the first 40 cargo emits |
+
+Hooks 36 to 38 are new in 0.10.0 and have not run in the game yet.
 
 ## Not hooked, called
 
-The mod calls these directly (no patch): `MoonWorld.DevAddMoney`,
-`WalletDollars`, `ChargeBuild`, `TryPurchaseTreeNode`,
+The mod calls these directly (no patch): `MoonWorld.SetTeamDollars`,
+`DevAddMoney`, `WalletDollars`, `WeighHex`, `Regions.Centers`,
+`TryGetCanister`, `MachineInputAt`, `BeltStartingAt`, `BeltEndingAt`,
+`MoonEnding.Play(true)` (the ending, in preview mode), `ChargeBuild`, `TryPurchaseTreeNode`,
 `MoonDepotBuilder.BeginPlacementFromShop`, `PlacementPose`,
 `RefreshCatalog`, `MoonCrewSession.SendBytes`, and Steam's
 `SteamNetworkingMessages.ReceiveMessagesOnChannel` on channel 7.

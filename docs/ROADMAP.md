@@ -9,7 +9,8 @@ Sweepers: Mars is larger, dirtier and needs real industry.
    their models, ice mines, the alien outposts, the ending, the setup
    window on a clean PC.
 2. **Belts.** The game's conveyors carry Mars items. Any side of a machine
-   can be input or output, the belt's direction decides.
+   can be input or output, the belt's direction decides. Plan and what is
+   measured first: [BELTS.md](BELTS.md).
 3. **Container port fed by belts.** Accepts only Mars materials and stores
    them for the crew (building, crafting, selling).
 4. **Logic gate.** A belt splitter you set up by looking at it: left or right

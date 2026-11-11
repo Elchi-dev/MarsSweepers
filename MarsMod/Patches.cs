@@ -66,6 +66,10 @@ namespace MarsMod
             // --- dust tiers: the bonus on top of the game's sector bounty (private void (int, string))
             Patch(AccessTools.Method(typeof(MoonWorld), "PaySection", new[] { typeof(int), typeof(string) }), pre: nameof(PaySection_Pre), post: nameof(PaySection_Post));
 
+            // --- belt research, passive: logs the first canisters entering machines and cargo put on belts
+            Patch(AccessTools.Method(typeof(MoonWorld), "EnterMachine", new[] { typeof(MoonDepotSnapshot), typeof(int), typeof(int) }), post: nameof(EnterMachine_Post));
+            Patch(AccessTools.Method(typeof(MoonWorld), "EmitCargo"), post: nameof(EmitCargo_Post));
+
             // --- our per-frame tick rides on two game components that live for the whole session
             Patch(AccessTools.Method(typeof(MoonCrashHeartbeat), "Update"), post: nameof(Frame_Post));
             Patch(AccessTools.Method(typeof(MoonFramePacer), "Update"), post: nameof(Frame_Post));
@@ -147,6 +151,9 @@ namespace MarsMod
 
         static void PaySection_Pre(MoonWorld __instance, string __1, out double __state) => __state = MarsWorld.InMarsWorld ? DustTiers.Before(__instance, __1) : double.NaN;
         static void PaySection_Post(MoonWorld __instance, int __0, string __1, double __state) => DustTiers.After(__instance, __0, __1, __state);
+
+        static void EnterMachine_Post(MoonWorld __instance, MoonDepotSnapshot __0, int __1, int __2, bool __result) => BeltResearch.EnterMachine(__instance, __0, __1, __2, __result);
+        static void EmitCargo_Post(MoonWorld __instance, MoonConveyorSnapshot __0, string __1, MoonCargo __2, double __3, bool __result) => BeltResearch.EmitCargo(__instance, __0, __1, __2, __3, __result, null);
 
         static void SaveWrite_Pre(MoonLooseDustSnapshot __1, out VanillaBuild.Taken __state)
         {
