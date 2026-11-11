@@ -28,6 +28,7 @@ namespace MarsMod
             ("unlock", "CHEAT: buy every upgrade in the upgrade tree for free"),
             ("give <item> [count]", "CHEAT: put Mars items in your backpack (give alone lists them)"),
             ("beltmode [on|off]", "EXPERIMENTAL (host): Mars items ride on the game's belts (docs/BELTS.md)"),
+            ("devil", "TEST: a dust devil crosses past you"),
             ("meteor", "CHEAT (host): drop a meteorite next to you"),
             ("aliens", "the alien trader outposts: where they are and what they offer now"),
             ("goals", "the Mars contract goals and the bonus for each"),
@@ -110,6 +111,7 @@ namespace MarsMod
                 case "belts": { var w0 = FindWalker(); foreach (var l in BeltResearch.Report(w0 != null ? w0.transform.position : Vector3.zero)) say(l); break; }
                 case "goals": foreach (var l in Goals.Report()) say(l); say(Goals.Current()); break;
                 case "beltmode": if (!MarsNet.IsHost) { say("Only the host can switch Mars belts."); break; } say(Belts.Toggle(Arg(1) != "off")); break;
+                case "devil": { var w0 = FindWalker(); if (w0 == null) break; say(DustDevils.Force(w0.transform.position)); break; }
                 case "meteor": if (!MarsNet.IsHost) { say("Only the host can drop meteorites."); break; } { var w0 = FindWalker(); say(Meteors.Drop(w0 != null ? w0.transform.position : (Vector3?)null) ?? "Meteorite dropped next to you."); } break;
                 case "aliens":
                 {

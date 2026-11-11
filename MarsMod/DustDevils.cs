@@ -30,6 +30,7 @@ namespace MarsMod
             if (!MarsWorld.InMarsWorld || home.sqrMagnitude < 1f || Haze.Storm > 0.15f || Haze.Front > 0.05f) return;
             var terrain = Commands.FindWorld()?.Terrain;
             if (terrain == null) return;
+            AddForced(terrain);
             double m = Minutes;
             long slot = (long)(m / SlotMinutes);
             for (long s = slot - 1; s <= slot; s++)
@@ -86,6 +87,23 @@ namespace MarsMod
                 }
         }
 
-        public static void Reset() { Active.Clear(); warned = -1; }
+        static Vector3 forcedAt; static float forcedSince = -1f;
+
+        /// <summary>Test: a devil that starts 40 m away and crosses past the player (this PC only; on the host it dusts machines too).</summary>
+        public static string Force(Vector3 player) { forcedAt = player; forcedSince = Time.realtimeSinceStartup; return "A dust devil spins up 40 m away."; }
+
+        static void AddForced(MoonCleaners.MoonTerrain terrain)
+        {
+            if (forcedSince < 0f) return;
+            float age = Time.realtimeSinceStartup - forcedSince;
+            if (age > 60f) { forcedSince = -1f; return; }
+            var up = forcedAt.normalized;
+            var e = Vector3.Cross(up, Vector3.forward); if (e.sqrMagnitude < 1e-4f) e = Vector3.right; e.Normalize();
+            var dir = (forcedAt + e * (-40f + age * 1.5f) + Vector3.Cross(up, e) * 8f).normalized;
+            float strength = Mathf.Clamp01(age / 5f) * Mathf.Clamp01((60f - age) / 5f);
+            Active.Add(new Devil { Center = terrain.SurfacePoint(dir), Up = dir, Age = age, Strength = strength, Id = -2 });
+        }
+
+        public static void Reset() { Active.Clear(); warned = -1; forcedSince = -1f; }
     }
 }
