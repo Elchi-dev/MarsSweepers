@@ -101,7 +101,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.8.0   ");
+                                                 |_|   setup v0.8.1   ");
             Console.ResetColor();
         }
 
@@ -650,17 +650,17 @@ namespace MarsSetup
             }
 
             Console.WriteLine();
-            Head("Mars 0.8 build tool test");
-            Info(" 1. Load your Mars world. Terminal (Ctrl+Shift+K): 'money' gives $10,000, 'tp mine' takes you to a mine.");
-            Info(" 2. Take out the game's build tool (hammer) and open the build menu: the Ore drill and Smelter are under");
-            Info("    Production, the Container port under Logistics, with pictures.");
-            Info(" 3. Place an Ore drill ON the mine (anywhere else the ghost stays red and says why). Rotate and build");
-            Info("    exactly like a game building. Then a Smelter and a Container port somewhere free.");
-            Info(" 4. E on the drill takes the ore, E on the smelter loads ore / takes plates, E on the container stores,");
-            Info("    Shift+E sells. Remove one with the build tool's remove mode: you get the money back.");
-            Info(" 5. Save, quit to the menu, load the world again: the machines must still be there. Load a MOON world:");
-            Info("    no Mars cards in its build menu. With a second player: do they see them, can they build and use them?");
-            Info(" 6. Quit the game. I'll build the report.");
+            Head("Mars 0.8.1 test");
+            Info(" A. Balance numbers (2 minutes): load your MOON world, open the terminal (Ctrl+Shift+K), type");
+            Info("    'economy', then just play a bit. The mod quietly notes money, cleaned sections and upgrades.");
+            Info(" B. Load your Mars world, 'money' gives $10,000, 'tp mine' takes you to a mine.");
+            Info(" C. Build tool (hammer), build menu: Ore drill and Smelter under Production, Container port under");
+            Info("    Logistics. Put the drill ON the mine (elsewhere the ghost stays red and says why).");
+            Info(" D. E on the drill takes ore, E on the smelter loads ore / takes plates, E on the container stores,");
+            Info("    Shift+E sells. Remove one with the build tool: you get the money back.");
+            Info(" E. Save, quit to the menu, load the Mars world again: are the machines still there? Then a Moon");
+            Info("    world: no Mars cards in its build menu. With a second player: do they see, build and use them?");
+            Info(" F. Quit the game. I'll build the report.");
             Info("Screenshots are very welcome, especially of the intro, the sky and a storm!");
             Console.WriteLine();
             var start = DateTime.Now;
@@ -708,8 +708,12 @@ namespace MarsSetup
                 AddDir(P("BepInEx", "MarsMod"), "BepInEx/MarsMod", f => !f.EndsWith(".wav", StringComparison.OrdinalIgnoreCase));
                 Add(Path.Combine(SaveDir, "Player.log"), "UnityPlayer/Player.log");
                 if (Directory.Exists(MarsSaveDir))
-                    foreach (var f in Directory.GetFiles(MarsSaveDir, "marsmod.json", SearchOption.AllDirectories))
-                        Add(f, "MarsSessions/" + f.Substring(MarsSaveDir.Length + 1));
+                    foreach (var f in Directory.GetFiles(MarsSaveDir, "*", SearchOption.AllDirectories))
+                    {
+                        string n = Path.GetFileName(f);
+                        if (n.StartsWith("mars", StringComparison.OrdinalIgnoreCase) && (n.EndsWith(".json") || n.EndsWith(".cfg") || n.EndsWith(".bak")))
+                            Add(f, "MarsSessions/" + f.Substring(MarsSaveDir.Length + 1));
+                    }
                 Add(Path.Combine(SaveDir, "Player-prev.log"), "UnityPlayer/Player-prev.log");
 
                 // The game's own interop assemblies: the C# view of the game's classes (no game code, only signatures).
