@@ -65,6 +65,7 @@ namespace MarsSetup
                     Console.WriteLine("  [11] Back to winhttp.dll (BepInEx's normal way)");
                     Console.WriteLine("  [12] Start the game directly, not through Steam (tells whether Steam's way of starting it is the problem)");
                     Console.WriteLine("  [13] Record with Process Monitor where Windows looks for BepInEx's loader, and what it answers");
+                    Console.WriteLine("  [14] FIX: switch off Windows' \"prefer system images\" rule for the game, then start it");
                     Console.WriteLine("  [0] Exit");
                     Console.Write("> ");
                     string c = (Console.ReadLine() ?? "").Trim();
@@ -91,6 +92,7 @@ namespace MarsSetup
                         case "11": UseWinhttpProxy(); break;
                         case "12": StartDirect(); break;
                         case "13": TraceLoader(); break;
+                        case "14": FixPreferSystem32(); break;
                         case "0": case "": return 0;
                     }
                 }
@@ -115,7 +117,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.13  ");
+                                                 |_|   setup v0.9.14  ");
             Console.ResetColor();
         }
 

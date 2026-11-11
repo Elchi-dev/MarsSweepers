@@ -3,6 +3,16 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.14
+
+### Fixed
+- Setup option [14]: Windows started MoonSweepers.exe with the exploit
+  protection rule "prefer system images" (PreferSystem32), read from the
+  running game on 2026-11-11 22:34, also when the setup started the game
+  itself. With it, Windows' own winhttp.dll beats BepInEx's loader in the
+  game folder. [14] records where the rule comes from (Get-ProcessMitigation,
+  Image File Execution Options) and switches it off for the game only.
+
 ## 0.9.13
 
 ### Added
