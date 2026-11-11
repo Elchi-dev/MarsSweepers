@@ -90,12 +90,15 @@ namespace MarsMod
         static bool Haul(Buildings.Rec hub, Def def)
         {
             var store = Buildings.Items.Storage;
-            int moved = 0;
+            int moved = 0; bool brushed = false;
             foreach (var r in Buildings.Data.List)
             {
                 if (r == hub || r.Owner == Aliens.Owner || (r.Pos - hub.Pos).sqrMagnitude > def.Radius2 * def.Radius2) continue;
                 var d = Get(r.Type);
-                if (d == null || Buildings.Jammed(r)) continue;
+                if (d == null) continue;
+                // The drones also brush the dust off (slowly: a jammed machine is clear again in about a minute).
+                if (d.Jams && r.Dust > 0f) { float before = r.Dust; r.Dust = Mathf.Max(0f, r.Dust - (Haze.Storm > 0.25f ? 0.03f : 0.1f)); if ((int)(before * 10) != (int)(r.Dust * 10)) brushed = true; }
+                if (Buildings.Jammed(r)) continue;
                 switch (d.Role)
                 {
                     case Role.Extractor:
@@ -122,7 +125,7 @@ namespace MarsMod
             }
             if (moved > 0) Buildings.StockChanged();
             hub.Burn = moved;          // shown in the prompt: items moved in the last round
-            return moved > 0;
+            return moved > 0 || brushed;
         }
 
         /// <summary>Is this machine doing work right now (for its moving parts and the grid's demand).</summary>

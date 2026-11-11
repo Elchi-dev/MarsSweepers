@@ -98,7 +98,7 @@ namespace MarsMod
                       Info = "Shows every Mars price and where it is heading. Sells from the crew storage, one material at a time." },
             new Def { Id = "hub", Name = "Logistics hub", Model = "hub", Role = Role.Hub, Price = 900, Radius = 2.0f, Category = "Logistics",
                       ItemCost = D(("iron_plate", 20)), Radius2 = 30f, PowerUse = 4f, Jams = true,
-                      Info = "Its drones empty every Mars machine within 30 m into the crew storage and refill their inputs from it, every 5 s. Needs 4 kW. Costs 20 iron plates too." },
+                      Info = "Its drones empty every Mars machine within 30 m into the crew storage, refill their inputs from it and brush the dust off, every 5 s. Needs 4 kW. Costs 20 iron plates too." },
             new Def { Id = "lightpole", Name = "Light pole", Model = "lightpole", Role = Role.Light, Price = 60, Radius = 0.8f, Category = "Power",
                       Info = "A lamp that clears the storm air around it (about 20 m), and carries power 25 m to the next building or pole." },
             new Def { Id = "solar", Name = "Mars solar panel", Model = "solar", Role = Role.Solar, Price = 150, Radius = 2.0f, Category = "Power",
