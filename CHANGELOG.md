@@ -3,6 +3,16 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.7
+
+### Added
+- Setup options [10] and [11]: start BepInEx through version.dll instead
+  of winhttp.dll, and back. Doorstop carries the functions of both. Needed
+  when something in the game process loads Windows' own winhttp.dll before
+  the game asks for it, which is what a report showed on 2026-11-11.
+- The diagnosis lists every module of the game process in load order and
+  marks those that are neither the game's nor Windows'.
+
 ## 0.9.6
 
 ### Added

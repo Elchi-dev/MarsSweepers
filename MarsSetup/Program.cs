@@ -61,6 +61,8 @@ namespace MarsSetup
                     Console.WriteLine("  [7] Open the game folder");
                     Console.WriteLine("  [8] Open the Mars saves folder");
                     Console.WriteLine("  [9] Check why mods do not load (also runs by itself on every game start)");
+                    Console.WriteLine("  [10] Start BepInEx through version.dll instead of winhttp.dll (when the game loads Windows' own winhttp.dll)");
+                    Console.WriteLine("  [11] Back to winhttp.dll (BepInEx's normal way)");
                     Console.WriteLine("  [0] Exit");
                     Console.Write("> ");
                     string c = (Console.ReadLine() ?? "").Trim();
@@ -82,6 +84,8 @@ namespace MarsSetup
                         case "7": Process.Start("explorer.exe", "\"" + game + "\""); break;
                         case "8": Directory.CreateDirectory(MarsSaveDir); Process.Start("explorer.exe", "\"" + MarsSaveDir + "\""); break;
                         case "9": Diagnose.Static(); foreach (var l in Diagnose.Lines) Info(l); break;
+                        case "10": UseVersionProxy(); break;
+                        case "11": UseWinhttpProxy(); break;
                         case "0": case "": return 0;
                     }
                 }
@@ -106,7 +110,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.6   ");
+                                                 |_|   setup v0.9.7   ");
             Console.ResetColor();
         }
 
@@ -285,7 +289,7 @@ namespace MarsSetup
                 if (File.Exists(ini) && Regex.IsMatch(File.ReadAllText(ini), @"(?im)^\s*enabled\s*=\s*false")) list.Add("doorstop_config.ini has 'enabled = false': BepInEx is switched off. Pick [1] to switch it on again.");
                 if (!File.Exists(P("dotnet", "coreclr.dll"))) list.Add("dotnet\\coreclr.dll is missing: BepInEx cannot start. Pick [1].");
                 foreach (var proxy in new[] { "version.dll", "winmm.dll", "dinput8.dll", "dxgi.dll", "d3d11.dll" })
-                    if (File.Exists(P(proxy))) list.Add($"{proxy} in the game folder: another mod loader may be hooked in there and can stop BepInEx.");
+                    if (File.Exists(P(proxy)) && !(proxy == "version.dll" && File.Exists(P("winhttp.dll.off")))) list.Add($"{proxy} in the game folder: another mod loader may be hooked in there and can stop BepInEx.");
                 string opts = LaunchOptions();
                 if (!string.IsNullOrWhiteSpace(opts))
                 {
@@ -360,6 +364,42 @@ namespace MarsSetup
 
         static string Sha(Stream s) { using (var h = SHA256.Create()) return BitConverter.ToString(h.ComputeHash(s)); }
 
+        /// <summary>
+        /// BepInEx starts through Doorstop, a small DLL the game loads by name from its own folder. Normally it is called
+        /// winhttp.dll. If something in the game process has already loaded Windows' own winhttp.dll by the time the
+        /// game asks for it, Windows hands out that copy and Doorstop never runs. The same Doorstop file also works
+        /// under the name version.dll (it carries version.dll's functions too), which the game asks for as well.
+        /// </summary>
+        static void UseVersionProxy()
+        {
+            if (!WaitForGameClosed()) return;
+            try
+            {
+                if (!File.Exists(P("winhttp.dll"))) { Warn("winhttp.dll (Doorstop) is not in the game folder. Pick [1] first."); return; }
+                File.Copy(P("winhttp.dll"), P("version.dll"), true);
+                if (File.Exists(P("winhttp.dll.off"))) File.Delete(P("winhttp.dll.off"));
+                File.Move(P("winhttp.dll"), P("winhttp.dll.off"));
+                Ok("BepInEx now starts through version.dll (winhttp.dll kept as winhttp.dll.off). [11] switches back.");
+            }
+            catch (Exception e) { Err(e.Message); }
+        }
+
+        static void UseWinhttpProxy()
+        {
+            if (!WaitForGameClosed()) return;
+            try
+            {
+                if (File.Exists(P("winhttp.dll.off")))
+                {
+                    if (File.Exists(P("winhttp.dll"))) File.Delete(P("winhttp.dll"));
+                    File.Move(P("winhttp.dll.off"), P("winhttp.dll"));
+                }
+                if (File.Exists(P("version.dll"))) File.Delete(P("version.dll"));
+                Ok("BepInEx starts through winhttp.dll again.");
+            }
+            catch (Exception e) { Err(e.Message); }
+        }
+
         /// <summary>The installed MarsMod.dll is exactly the one in this setup.</summary>
         static bool ModCurrent()
         {
@@ -424,6 +464,7 @@ namespace MarsSetup
                     {
                         string n = e.FullName.Replace('\\', '/');
                         if (n.EndsWith("/") || n.StartsWith("BepInEx/config/")) continue;
+                        if (n == "winhttp.dll" && File.Exists(P("winhttp.dll.off"))) continue;   // started through version.dll ([10])
                         string dst = Path.Combine(game, n.Replace('/', Path.DirectorySeparatorChar));
                         try { Directory.CreateDirectory(Path.GetDirectoryName(dst)); e.ExtractToFile(dst, true); }
                         catch (Exception ex) { Warn("Could not refresh " + n + ": " + ex.Message); }
@@ -734,7 +775,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.6: one test round for everything");
+            Head("Mars 0.9.7: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");

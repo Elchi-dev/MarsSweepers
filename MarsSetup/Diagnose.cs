@@ -230,6 +230,8 @@ namespace MarsSetup
                 }
             }
 
+            static readonly HashSet<int> listed = new HashSet<int>();
+
             static bool ModulesOnce(int pid)
             {
                 try
@@ -239,8 +241,20 @@ namespace MarsSetup
                     string win = mods.FirstOrDefault(m => Path.GetFileName(m).Equals("winhttp.dll", StringComparison.OrdinalIgnoreCase));
                     string clr = mods.FirstOrDefault(m => Path.GetFileName(m).Equals("coreclr.dll", StringComparison.OrdinalIgnoreCase));
                     L($"process {pid}: winhttp.dll loaded from {(win ?? "nowhere")}; coreclr.dll {(clr ?? "NOT loaded (BepInEx's .NET did not start)")}; {mods.Count} modules");
-                    foreach (var m in mods.Where(m => m.StartsWith(game, StringComparison.OrdinalIgnoreCase)))
-                        L($"process {pid} module from the game folder: {m.Substring(game.Length).TrimStart('\\')}");
+                    // Modules come in load order. Whatever loaded Windows' winhttp.dll before the game asked for it shows up here.
+                    if (!listed.Contains(pid))
+                    {
+                        listed.Add(pid);
+                        string win32 = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                        int i = 0;
+                        foreach (var m in mods)
+                        {
+                            string where = m.StartsWith(game, StringComparison.OrdinalIgnoreCase) ? "game: " + m.Substring(game.Length).TrimStart('\\')
+                                         : m.StartsWith(win32, StringComparison.OrdinalIgnoreCase) ? "windows: " + m.Substring(win32.Length).TrimStart('\\')
+                                         : "OTHER: " + m;
+                            L($"process {pid} module {i++:00}: {where}");
+                        }
+                    }
                     return true;
                 }
                 catch (Exception e) { L($"process {pid}: modules unreadable ({e.Message}), it may have exited (Steam restarts games it did not start itself)"); return false; }
