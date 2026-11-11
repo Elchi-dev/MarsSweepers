@@ -27,6 +27,7 @@ namespace MarsMod
         }
 
         static readonly Dictionary<int, Coverage> cover = new Dictionary<int, Coverage>();
+        static readonly Dictionary<int, float> failed = new Dictionary<int, float>();
         static Material domeMat, floorMat;
         static int previewId = -1;
         static float previewUntil;
@@ -60,7 +61,8 @@ namespace MarsMod
         static Coverage Get(Buildings.Rec b)
         {
             if (cover.TryGetValue(b.Id, out var c) && (c.Center - b.Pos).sqrMagnitude < 0.25f) return c;
-            try { c = Fill(b.Pos); } catch (Exception e) { Log.Once("shield-fill", "[shield] coverage failed: " + e.Message); return null; }
+            if (failed.TryGetValue(b.Id, out var at) && Time.realtimeSinceStartup - at < 10f) return null;   // retry slowly
+            try { c = Fill(b.Pos); } catch (Exception e) { failed[b.Id] = Time.realtimeSinceStartup; Log.Once("shield-fill", "[shield] coverage failed: " + e.Message); return null; }
             if (cover.TryGetValue(b.Id, out var old)) { if (old.Dome != null) UnityEngine.Object.Destroy(old.Dome); if (old.Floor != null) UnityEngine.Object.Destroy(old.Floor); }
             cover[b.Id] = c;
             Plugin.Log.LogMessage($"[shield] #{b.Id} covers {c.Cells.Count} cells ({c.Cells.Count * Cell * Cell:0} m²)");
