@@ -45,7 +45,7 @@ namespace MarsMod
 
     internal static class MarsCatalog
     {
-        public enum Role { Extractor, Recipe, Storage, Light, Solar, Battery, Generator, Shield, Market, Cannon, Trader, Hub }
+        public enum Role { Extractor, Recipe, Storage, Light, Solar, Battery, Generator, Shield, Market, Cannon, Trader, Hub, Meteor }
 
         public sealed class Def
         {
@@ -122,6 +122,8 @@ namespace MarsMod
         {
             new Def { Id = "outpost", Name = "Alien trader outpost", Model = "outpost", Role = Role.Trader, Radius = 4f, Category = "World",
                       Info = "Trades alien alloy for what the crew makes. The offers change every 8 minutes." },
+            new Def { Id = "meteor", Name = "Meteorite", Model = "meteor", Role = Role.Meteor, Radius = 2.5f, Category = "World",
+                      Info = "Fell from the sky. Holds iron and, sometimes, alien alloy." },
         };
 
         public static Def Get(string id) => All.Find(d => d.Id == id) ?? World.Find(d => d.Id == id);

@@ -77,6 +77,7 @@ namespace MarsMod
         }
 
         public static void StockChanged() => stockDirty = true;
+        public static void Changed() { dirty = true; stockDirty = true; viewsDirty = true; }
 
         public static int Count(Dictionary<string, int> inv, string item) => inv != null && inv.TryGetValue(item, out var n) ? n : 0;
         public static void AddTo(Dictionary<string, int> inv, string item, int n) { inv[item] = Count(inv, item) + n; if (inv[item] <= 0) inv.Remove(item); }
@@ -146,6 +147,7 @@ namespace MarsMod
                     if (rec == null) return null;
                     if (rec.Vanilla) return "Remove it with the build tool, like any other building.";
                     if (rec.Owner == Aliens.Owner) return "The aliens would not like that.";
+                    if (rec.Owner == Meteors.Owner) return Meteors.Take(rec, player);
                     var def = MarsCatalog.Get(rec.Type);
                     Data.List.Remove(rec);
                     // Contents go to the player who removed it, the price back to their wallet.
@@ -473,6 +475,7 @@ namespace MarsMod
                         go.name = $"Mars {def.Name} #{b.Id}";
                         views[b.Id] = go;
                         if (b.Owner == Aliens.Owner) Aliens.Decorate(go);
+                        if (b.Owner == Meteors.Owner) Meteors.Decorate(go);
                     }
                     catch (Exception e) { Log.Once("view-" + b.Type, $"[build] {def.Name} model failed: {e.Message}"); }
                 }

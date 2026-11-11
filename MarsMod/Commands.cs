@@ -27,6 +27,7 @@ namespace MarsMod
             ("money [amount]", "CHEAT: add money (default $10,000)"),
             ("unlock", "CHEAT: buy every upgrade in the upgrade tree for free"),
             ("give <item> [count]", "CHEAT: put Mars items in your backpack (give alone lists them)"),
+            ("meteor", "CHEAT (host): drop a meteorite next to you"),
             ("aliens", "the alien trader outposts: where they are and what they offer now"),
             ("goals", "the Mars contract goals and the bonus for each"),
             ("power", "every power grid: what it makes, uses and stores"),
@@ -107,6 +108,7 @@ namespace MarsMod
                 case "ending": if (!MarsNet.IsHost) { say("Only the host can start the ending."); break; } Ending.Fire(); say("Ending in " + Ending.Countdown + " s (cheat: no cannon needed)."); break;
                 case "belts": { var w0 = FindWalker(); foreach (var l in BeltResearch.Report(w0 != null ? w0.transform.position : Vector3.zero)) say(l); break; }
                 case "goals": foreach (var l in Goals.Report()) say(l); say(Goals.Current()); break;
+                case "meteor": if (!MarsNet.IsHost) { say("Only the host can drop meteorites."); break; } { var w0 = FindWalker(); say(Meteors.Drop(w0 != null ? w0.transform.position : (Vector3?)null) ?? "Meteorite dropped next to you."); } break;
                 case "aliens":
                 {
                     var w0 = FindWalker(); var p0 = w0 != null ? w0.transform.position : Vector3.zero;

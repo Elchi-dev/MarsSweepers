@@ -38,6 +38,10 @@ plugin). Newest first.
 - Alien trader outposts: three per world. They trade alien alloy for what
   the crew makes; two offers each, new ones every 8 minutes. They glow
   purple at night; `aliens` lists them, `tp alien` and `tp ice` go there.
+- Meteorites: every 15 to 30 minutes one falls 150 to 700 m from the
+  Collector and everyone is told where. It glows, holds hematite and often
+  alien alloy; whoever gets there first takes it all. `meteor` drops one
+  next to you (host, cheat).
 - The ending: the planet cannon (alien alloy, machine parts, 30 rocket fuel,
   60 kW) fires at the Moon. The game's own ending sequence plays with the
   Moon in the sky. `ending` plays it right away (host, cheat).

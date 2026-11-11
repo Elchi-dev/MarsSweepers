@@ -24,6 +24,8 @@ namespace MarsMod
         }
 
         public static readonly List<Mine> All = new List<Mine>();
+        /// <summary>The main Collector's position (set when the mines are worked out).</summary>
+        public static Vector3 Home;
         /// <summary>Where the alien traders land (worked out with the mines, the same on every PC).</summary>
         public static readonly List<(Vector3 pos, Quaternion rot)> AlienSites = new List<(Vector3, Quaternion)>();
         static int builtForSeed = int.MinValue;
@@ -71,6 +73,7 @@ namespace MarsMod
             }
 
             // 1. Home mine: on a ring 34-60 m around the main Collector, the flattest reachable spot.
+            Home = home;
             DustTiers.Setup(home, seed);
             var rnd = new System.Random(seed);
             {

@@ -99,7 +99,7 @@ namespace MarsMod
             // Every frame while on Mars: buildings, the build menu, and the haze following the camera.
             if (marsWorld)
             {
-                try { VanillaBuild.PlacementFrame(); Buildings.Tick(now, dt); Goals.Tick(now); Market.Tick(now); LightPoles.Tick(); Shields.Frame(dt); Ending.Frame(); Ending.After(); if (Camera.main != null) DustTiers.Frame(Camera.main.transform.position); BuildMode.Frame(now, dt); }
+                try { VanillaBuild.PlacementFrame(); Buildings.Tick(now, dt); Goals.Tick(now); Meteors.Tick(now); Market.Tick(now); LightPoles.Tick(); Shields.Frame(dt); Ending.Frame(); Ending.After(); if (Camera.main != null) DustTiers.Frame(Camera.main.transform.position); BuildMode.Frame(now, dt); }
                 catch (Exception e) { Log.Once("build-frame", "Mars buildings: " + e); }
                 try
                 {
@@ -268,6 +268,7 @@ namespace MarsMod
             DustTiers.Reset();
             Ending.Reset();
             Goals.Reset(); goalsShown = false;
+            Meteors.Reset();
             VanillaBuild.Reset();
             Market.Reset();
             Mines.Clear();

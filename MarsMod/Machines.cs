@@ -222,6 +222,7 @@ namespace MarsMod
                     if (b.Dust > 0.05f) { b.Dust = 0f; return "Wiped the dust off the panel."; }
                     return null;
                 case Role.Trader: return Aliens.Trade(b, player, alt, world);
+                case Role.Meteor: return Meteors.Take(b, player);
                 case Role.Cannon:
                 {
                     int fuel = Buildings.Count(b.Items, "rocket_fuel");
@@ -280,6 +281,7 @@ namespace MarsMod
                 case Role.Generator:
                     return $"{name}  ·  fuel {Buildings.Count(b.Items, "rocket_fuel")}/{def.Cap}" + (b.Burn > 0 ? $"  ·  running ({b.Burn:0} s of fuel left)" : "  ·  idle") + power;
                 case Role.Trader: return Aliens.Describe(b, def);
+                case Role.Meteor: return $"{name}  ·  {MarsItems.List(b.Items)}";
                 case Role.Hub:
                 {
                     int n = Buildings.Data.List.Count(r => r != b && r.Owner != Aliens.Owner && (r.Pos - b.Pos).sqrMagnitude <= def.Radius2 * def.Radius2 &&
@@ -307,6 +309,7 @@ namespace MarsMod
                 case Role.Market: return $"[{key}] sell the best-paying material   [Shift+{key}] auto-selling {(b.Active ? "off" : "on")}";
                 case Role.Solar: return b.Dust > 0.05f ? $"[{key}] wipe the dust off" : "";
                 case Role.Trader: return Aliens.Hint(key);
+                case Role.Meteor: return $"[{key}] take it all";
                 case Role.Cannon: return $"[{key}] load rocket fuel   [Shift+{key}] FIRE at the Moon";
             }
             return "";

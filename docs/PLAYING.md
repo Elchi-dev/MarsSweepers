@@ -36,6 +36,8 @@ Each goal pays the crew a bonus. `goals` in the terminal lists them all.
    for the generator, the aliens and the cannon.
 8. **Aliens.** Three outposts glow purple. They trade alien alloy for what you
    make; the offers change every 8 minutes.
+   Meteorites (announced, glowing orange) sometimes carry alloy too: be
+   the first one there.
 9. **Shield generator**: when a storm comes it raises a dome. Look at it to
    see the covered ground. It needs its full 30 kW, so give it a generator
    or a big battery.
