@@ -3,6 +3,17 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.4
+
+### Fixed
+- Install now puts BepInEx's loader files (winhttp.dll, doorstop config,
+  the .NET runtime, core) back every time, even when the right BepInEx is
+  already there, so a changed or disabled loader is repaired.
+- The setup checks what stops BepInEx from starting at all and says so:
+  a missing winhttp.dll or runtime, `enabled = false`, other proxy DLLs of
+  other loaders, and Steam launch options that switch it off. The report
+  includes the launch options and the doorstop config.
+
 ## 0.9.3
 
 ### Added
