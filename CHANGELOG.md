@@ -3,6 +3,16 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.3
+
+### Added
+- `mars slot <n>`: makes an empty save slot a Mars slot from the terminal,
+  also in the main menu, in case the Moon or Mars question does not show.
+
+### Fixed
+- The setup report includes every BepInEx log file, not only the first
+  one (a second game start writes to another file).
+
 ## 0.9.2
 
 ### Fixed
