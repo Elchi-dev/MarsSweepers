@@ -22,7 +22,20 @@ namespace MarsSetup
         static string game;               // game folder
         static string settingsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MarsMod");
 
+        [STAThread]
         static int Main(string[] args)
+        {
+            // Players get the window (Installer.cs). "--dev" opens the old console menu with every tool.
+            if (!args.Any(a => a.Equals("--dev", StringComparison.OrdinalIgnoreCase) || a.Equals("--console", StringComparison.OrdinalIgnoreCase)))
+                return Installer.Run(args);
+            AllocConsole();
+            args = args.Where(a => !a.StartsWith("--")).ToArray();
+            return ConsoleMain(args);
+        }
+
+        [DllImport("kernel32.dll")] static extern bool AllocConsole();
+
+        static int ConsoleMain(string[] args)
         {
             try { Console.OutputEncoding = Encoding.UTF8; } catch { }
             Console.Title = "Mars Sweepers setup";
@@ -121,20 +134,29 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.16  ");
+                                                 |_|   setup v0.10.0  ");
             Console.ResetColor();
         }
 
-        static void Head(string s) { Console.ForegroundColor = ConsoleColor.Cyan; Console.WriteLine(s); Console.ResetColor(); }
-        static void Info(string s) { Console.WriteLine("  " + s); }
-        static void Ok(string s) { Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("  OK  " + s); Console.ResetColor(); }
-        static void Warn(string s) { Console.ForegroundColor = ConsoleColor.Yellow; Console.WriteLine("  !!  " + s); Console.ResetColor(); }
-        static void Err(string s) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("  XX  " + s); Console.ResetColor(); }
+        /// <summary>Set by the window: every message goes there instead of the console (kind: 0 head, 1 info, 2 ok, 3 warn, 4 error).</summary>
+        internal static Action<int, string> Gui;
+        /// <summary>The window asks yes/no questions itself.</summary>
+        internal static Func<string, bool, bool> GuiAsk;
+        /// <summary>Installs for playing: no MarsProbe, no BepInEx console window.</summary>
+        internal static bool PlayerMode;
+        internal static volatile bool Cancel;
+
+        static void Head(string s) { if (Gui != null) { Gui(0, s); return; } Console.ForegroundColor = ConsoleColor.Cyan; Console.WriteLine(s); Console.ResetColor(); }
+        static void Info(string s) { if (Gui != null) { Gui(1, s); return; } Console.WriteLine("  " + s); }
+        static void Ok(string s) { if (Gui != null) { Gui(2, s); return; } Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("  OK  " + s); Console.ResetColor(); }
+        static void Warn(string s) { if (Gui != null) { Gui(3, s); return; } Console.ForegroundColor = ConsoleColor.Yellow; Console.WriteLine("  !!  " + s); Console.ResetColor(); }
+        static void Err(string s) { if (Gui != null) { Gui(4, s); return; } Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("  XX  " + s); Console.ResetColor(); }
         static int Fail(string s) { Err(s); Pause(); return 1; }
-        static void Pause() { Console.WriteLine(); Console.WriteLine("Press Enter to close."); Console.ReadLine(); }
+        static void Pause() { if (Gui != null) return; Console.WriteLine(); Console.WriteLine("Press Enter to close."); Console.ReadLine(); }
 
         static bool Ask(string q, bool def)
         {
+            if (GuiAsk != null) return GuiAsk(q, def);
             Console.Write("  " + q + (def ? " [Y/n] " : " [y/N] "));
             string a = (Console.ReadLine() ?? "").Trim().ToLowerInvariant();
             if (a == "") return def;
@@ -208,6 +230,7 @@ namespace MarsSetup
                 if (Good(d)) return Remember(d);
             }
 
+            if (Gui != null) return null;   // the window asks for the folder itself
             Warn("I could not find Moon Sweepers automatically.");
             Info("In Steam: right-click Moon Sweepers > Manage > Browse local files, then copy the folder path from the address bar.");
             while (true)
@@ -359,10 +382,11 @@ namespace MarsSetup
         {
             if (!GameRunning()) return true;
             Warn("Moon Sweepers is running. Please close it first.");
-            Info("Waiting… (press Esc to cancel)");
+            Info(Gui != null ? "Waiting for the game to close…" : "Waiting… (press Esc to cancel)");
             while (GameRunning())
             {
-                if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Escape) return false;
+                if (Cancel) return false;
+                if (Gui == null && Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Escape) return false;
                 Thread.Sleep(500);
             }
             Thread.Sleep(1500);
@@ -582,15 +606,19 @@ namespace MarsSetup
             }
             catch (Exception e) { Warn("Narrator voice not installed: " + e.Message); }
 
-            // ---- MarsProbe (debug helper, writes the report)
-            Directory.CreateDirectory(Path.GetDirectoryName(ProbePath));
-            using (var s = Res("MarsProbe.dll"))
-            using (var f = File.Create(ProbePath)) s.CopyTo(f);
-            Ok("MarsProbe installed");
+            // ---- MarsProbe (debug helper, writes the report): only for testers
+            if (!PlayerMode)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(ProbePath));
+                using (var s = Res("MarsProbe.dll"))
+                using (var f = File.Create(ProbePath)) s.CopyTo(f);
+                Ok("MarsProbe installed");
+            }
 
             // ---- BepInEx settings: console window + flush log lines immediately + include Unity's own log
             ConfigureBepInEx();
 
+            if (PlayerMode) return File.Exists(PatcherPath);
             Console.WriteLine();
             Head("Good to know before you start the game");
             Info("* The first start takes 1-2 minutes longer and needs internet: BepInEx downloads Unity libraries");
@@ -632,12 +660,12 @@ namespace MarsSetup
             string cfg = P("BepInEx", "config", "BepInEx.cfg");
             Directory.CreateDirectory(Path.GetDirectoryName(cfg));
             var lines = File.Exists(cfg) ? File.ReadAllLines(cfg).ToList() : new List<string>();
-            SetIni(lines, "Logging.Console", "Enabled", "true");
+            SetIni(lines, "Logging.Console", "Enabled", PlayerMode ? "false" : "true");
             SetIni(lines, "Logging.Disk", "InstantFlushing", "true");
             SetIni(lines, "Logging.Disk", "WriteUnityLog", "true");
             SetIni(lines, "Logging", "UnityLogListening", "true");
             File.WriteAllLines(cfg, lines);
-            Ok("BepInEx logging configured (console window on, instant log flushing, Unity log included)");
+            Ok(PlayerMode ? "BepInEx configured (no console window)" : "BepInEx logging configured (console window on, instant log flushing, Unity log included)");
         }
 
         static void SetIni(List<string> lines, string section, string key, string value)
@@ -663,6 +691,7 @@ namespace MarsSetup
         // ================================================================== patcher (from Nexus, needs the player's login)
         static bool GetPatcher()
         {
+            if (Gui != null) return GetPatcherGui();
             Info("The MoonSweepers BepInEx Patcher by boverson777 is needed; stock BepInEx can't load mods in this game.");
             Info("It is hosted on Nexus Mods, which needs your (free) login to download, so I can't fetch it myself.");
 
@@ -824,7 +853,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.16: one test round for everything");
+            Head("Mars 0.10.0: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");
@@ -979,6 +1008,7 @@ namespace MarsSetup
             if (!WaitForGameClosed()) return;
             string bak = P("MarsMod_removed_" + Stamp());
             Directory.CreateDirectory(bak);
+            try { UndoDstorageRoute(); } catch (Exception e) { Warn("dstorage.dll: " + e.Message); }
             foreach (var f in new[] { "winhttp.dll", "doorstop_config.ini", ".doorstop_version", "changelog.txt" })
                 if (File.Exists(P(f))) File.Move(P(f), Path.Combine(bak, f));
             foreach (var d in new[] { "BepInEx", "dotnet", "MarsProbe" })

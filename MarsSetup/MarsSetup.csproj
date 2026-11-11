@@ -2,7 +2,7 @@
 
   <!-- .NET Framework 4.8 ships with every Windows 10/11, so the exe runs without installing anything. -->
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <AssemblyName>MarsSetup</AssemblyName>
     <RootNamespace>MarsSetup</RootNamespace>
@@ -10,9 +10,9 @@
     <Nullable>disable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <Version>0.9.16</Version>
+    <Version>0.10.0</Version>
     <Product>Mars Sweepers setup</Product>
-    <Description>Installs BepInEx, the MoonSweepers BepInEx Patcher and the MarsProbe debug mod into Moon Sweepers.</Description>
+    <Description>Installs Mars Sweepers (BepInEx, the Mars mod) into Moon Sweepers. Start with --dev for the tester tools.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -25,6 +25,8 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
 
   <ItemGroup>
