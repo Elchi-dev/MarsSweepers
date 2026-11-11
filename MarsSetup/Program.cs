@@ -871,6 +871,7 @@ namespace MarsSetup
             Info("  5. 'storm now' with a powered shield: dome up, no dust inside? After the storm: 'devil', 'meteor'.");
             Info("     'ending' plays the ending (cheat), do it last.");
             Info("  6. 'belts' next to a Mars machine. Then 'beltmode on' and lay a belt from a drill to the container port.");
+            Info("     Bonus: a game splitter on that belt, 'gate item hematite' next to it.");
             Info("  7. 'economy', save, reload, quit. I'll build the report.");
             Info("Screenshots are very welcome, especially of the intro, the sky and a storm!");
             Console.WriteLine();
