@@ -3,6 +3,14 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.2
+
+### Fixed
+- Setup option [2] (start the game) started whatever Mars mod was already
+  installed, which could be months old. It now installs this setup's mod
+  first when the installed one differs, and the status line says when the
+  installed mod is an older version.
+
 ## 0.9.1
 
 ### Added
