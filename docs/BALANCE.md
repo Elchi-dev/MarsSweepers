@@ -69,6 +69,7 @@ Every alloy offer asks for about $300 or more of materials at normal
 prices (25 rocket fuel, 60 fiber, 70 iron plates, 100 oxygen, 20 machine
 parts) or $3000 in cash, far above alloy's $90 sale price: alloy is for
 building, not selling. The cannon needs 10, about an hour of a running
-machine-part line. The traders also buy alloy back, for 10 machine parts
-($220) or $250, below the cheapest way to get one, so no trade loop makes
-money by itself.
+machine-part line. Big orders (40 parts and 15 fuel, or 120 fiber and 80
+plates, for 4 alloy) come to about $240 to $265 per alloy. The traders also
+buy alloy back, for 8 machine parts ($176) or $200, below the cheapest way
+to get one, so no trade loop makes money by itself.

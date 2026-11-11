@@ -39,8 +39,11 @@ namespace MarsMod
             new Offer { Dollars = 3000, Get = { ["alien_alloy"] = 1 } },
             O("ice", 80, "rocket_fuel", 6),
             O("hematite", 120, "machine_part", 6),
-            O("alien_alloy", 1, "machine_part", 10),
-            new Offer { Give = { ["alien_alloy"] = 1 }, PayDollars = 250 },
+            O("alien_alloy", 1, "machine_part", 8),
+            new Offer { Give = { ["alien_alloy"] = 1 }, PayDollars = 200 },
+            // Big orders: a bulk deal, a little cheaper per alloy than the small ones.
+            new Offer { Give = { ["machine_part"] = 40, ["rocket_fuel"] = 15 }, Get = { ["alien_alloy"] = 4 } },
+            new Offer { Give = { ["basalt_fiber"] = 120, ["iron_plate"] = 80 }, Get = { ["alien_alloy"] = 4 } },
         };
 
         // The wall clock (UTC), so every PC shows the same offers without sending anything.
