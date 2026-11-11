@@ -25,6 +25,7 @@ namespace MarsMod
             public bool Vanilla;        // placed with the game's build tool: the game owns it (Id = VanillaIds + depot id)
             public Dictionary<string, int> Items = new Dictionary<string, int>();
             public float Progress;
+            public float Dust;          // storm dust on the machine, 0..1; at 1 it is jammed
             public Vector3 Pos => new Vector3(Px, Py, Pz);
             public Quaternion Rot => new Quaternion(Qx, Qy, Qz, Qw);
         }
@@ -79,7 +80,7 @@ namespace MarsMod
 
         // ------------------------------------------------------------------ requests (anyone → host)
 
-        public enum Op : byte { Place = 1, Remove = 2, Use = 3, UseAlt = 4, Give = 5, Money = 6, Free = 7, Speed = 8 }
+        public enum Op : byte { Place = 1, Remove = 2, Use = 3, UseAlt = 4, Give = 5, Money = 6, Free = 7, Speed = 8, Clean = 9 }
 
         /// <summary>Ask the host to do something (the host just does it).</summary>
         public static void Ask(Op op, Action<BinaryWriter> body)
@@ -169,6 +170,14 @@ namespace MarsMod
                     Earn(world, player, d);
                     return $"+${d:0}";
                 }
+                case Op.Clean:
+                {
+                    int id = r.ReadInt32();
+                    var rec = Data.List.Find(b => b.Id == id);
+                    if (rec == null || rec.Dust <= 0f) return null;
+                    rec.Dust = 0f; dirty = true; Sync(true);
+                    return $"{MarsCatalog.Get(rec.Type)?.Name ?? "Machine"} scrubbed clean.";
+                }
                 case Op.Free: FreeBuild = r.ReadBoolean(); VanillaBuild.SetPrices(); return "Free building " + (FreeBuild ? "ON" : "off") + " (for everyone in this world).";
                 case Op.Speed: SpeedCheat = Mathf.Clamp(r.ReadSingle(), 0.1f, 50f); return $"Machines run at {SpeedCheat:0.#}x speed.";
             }
@@ -178,6 +187,7 @@ namespace MarsMod
         static string Use(Rec rec, string player, bool alt, MoonWorld world)
         {
             var pack = Backpack(player);
+            if (Jams(rec) && Jammed(rec)) return $"The {MarsCatalog.Get(rec.Type)?.Name ?? "machine"} is jammed by storm dust: hold the interact key to scrub it.";
             switch (rec.Type)
             {
                 case "drill":
@@ -205,7 +215,7 @@ namespace MarsMod
                     if (alt)
                     {
                         double money = 0; int n = 0;
-                        foreach (var kv in Items.Storage.ToList()) { money += MarsItems.Sell(kv.Key) * kv.Value; n += kv.Value; }
+                        foreach (var kv in Items.Storage.ToList()) { money += Market.Sell(kv.Key, kv.Value); n += kv.Value; }
                         if (n == 0) return "The crew storage is empty.";
                         Items.Storage.Clear();
                         Earn(world, player, money);
@@ -348,17 +358,50 @@ namespace MarsMod
             }
         }
 
+        public const float JamSeconds = 75f;      // a full storm jams an unprotected machine in this time
+        public const float CleanSeconds = 3.5f;   // holding E this long scrubs a machine
+
+        public static bool Jams(Rec b) => b.Type == "drill" || b.Type == "smelter";
+        public static bool Jammed(Rec b) => b.Dust >= 1f;
+
+        static readonly Dictionary<int, (float until, bool roofed)> roofCache = new Dictionary<int, (float, bool)>();
+        static bool Roofed(Rec b)
+        {
+            float now = Time.realtimeSinceStartup;
+            if (roofCache.TryGetValue(b.Id, out var c) && now < c.until) return c.roofed;
+            bool roofed = false;
+            try
+            {
+                float top = Models.Get(MarsCatalog.Get(b.Type).Model).Bounds.max.y + 0.4f;
+                var up = b.Pos.normalized;
+                roofed = Shelter.Roofed(b.Pos + up * top, up);
+            }
+            catch { }
+            roofCache[b.Id] = (now + 5f, roofed);
+            return roofed;
+        }
+
         static void Produce(float dt)
         {
+            float storm = Haze.Storm;
             foreach (var b in Data.List)
             {
+                if (Jams(b) && storm > 0.25f && !Roofed(b))
+                {
+                    float before = b.Dust;
+                    b.Dust = Mathf.Min(1f, b.Dust + dt / SpeedCheatSafe() * storm / JamSeconds);
+                    if (before < 1f && b.Dust >= 1f) { dirty = true; Plugin.Log.LogMessage($"[build] {b.Type} #{b.Id} jammed by the storm"); }
+                    if ((int)(before * 10) != (int)(b.Dust * 10)) dirty = true;
+                }
+                if (Jammed(b)) continue;
+                float slow = 1f - b.Dust * 0.5f;      // a dusty machine runs slower before it stops
                 switch (b.Type)
                 {
                     case "drill":
                     {
                         var mine = Mines.ById(b.Mine);
                         if (mine == null || Total(b.Items) >= DrillCap) break;
-                        b.Progress += dt / DrillSeconds;
+                        b.Progress += dt * slow / DrillSeconds;
                         while (b.Progress >= 1f && Total(b.Items) < DrillCap) { b.Progress -= 1f; Add(b.Items, mine.Ore, 1); dirty = true; }
                         if (Total(b.Items) >= DrillCap) b.Progress = 0f;
                         break;
@@ -366,13 +409,15 @@ namespace MarsMod
                     case "smelter":
                     {
                         if (Count(b.Items, "hematite") < 2 || Count(b.Items, "iron_plate") >= SmelterCap) { b.Progress = 0f; break; }
-                        b.Progress += dt / SmelterSeconds;
+                        b.Progress += dt * slow / SmelterSeconds;
                         if (b.Progress >= 1f) { b.Progress = 0f; Add(b.Items, "hematite", -2); Add(b.Items, "iron_plate", 1); dirty = true; }
                         break;
                     }
                 }
             }
         }
+
+        static float SpeedCheatSafe() => Mathf.Max(0.1f, SpeedCheat);   // the speed cheat does not make storms faster
 
         static void Sync(bool now)
         {
@@ -428,7 +473,7 @@ namespace MarsMod
                         float d = Vector3.Distance(go.transform.position, b.Pos);
                         if (d < bd) { bd = d; best = go; }
                     }
-                    if (best != null) { views[b.Id] = best; taken.Add(best.Pointer); Models.Track(best); }
+                    if (best != null) { views[b.Id] = best; taken.Add(best.Pointer); Models.Track(best); if (b.Type == "lightpole") LightPoles.Attach(best); }
                 }
             }
             // Mines: hidden under their drill (the survey stake would poke through) and when far away (frame rate).
@@ -447,7 +492,7 @@ namespace MarsMod
             // Moving parts only turn while the machine works.
             foreach (var b in Data.List)
                 if (views.TryGetValue(b.Id, out var v) && v != null)
-                    Models.SetRunning(v, b.Progress > 0.001f || (b.Type == "drill" && Total(b.Items) < DrillCap && b.Mine >= 0));
+                    Models.SetRunning(v, !Jammed(b) && (b.Progress > 0.001f || (b.Type == "drill" && Total(b.Items) < DrillCap && b.Mine >= 0)));
         }
 
         public static void ClearViews()
@@ -480,6 +525,8 @@ namespace MarsMod
             var def = MarsCatalog.Get(b.Type);
             switch (b.Type)
             {
+                case "lightpole":
+                    return $"<b>{def.Name}</b>  ·  clears the storm air around it";
                 case "drill":
                     var mine = Mines.ById(b.Mine);
                     return $"<b>{def.Name}</b>  ·  {(mine != null ? MarsItems.Name(mine.Ore) : "no mine")} {Total(b.Items)}/{DrillCap}" +
@@ -492,13 +539,21 @@ namespace MarsMod
             return def?.Name ?? b.Type;
         }
 
+        public static string DustLine(Rec b)
+        {
+            if (!Jams(b) || b.Dust < 0.05f) return "";
+            return Jammed(b) ? "  <color=#FF6B5A><b>JAMMED</b> by storm dust</color>" : $"  <color=#FFC266>dusty {b.Dust * 100f:0}%</color>";
+        }
+
         public static string Hint(Rec b, string useKey)
         {
+            if (Jams(b) && b.Dust >= 0.3f) return $"[hold {useKey}] scrub off the dust";
             switch (b.Type)
             {
                 case "drill": return $"[{useKey}] take the ore";
                 case "smelter": return $"[{useKey}] load ore / take plates   [Shift+{useKey}] take plates";
-                case "container": return $"[{useKey}] store your backpack   [Shift+{useKey}] sell the crew storage";
+                case "container": return $"[{useKey}] store your backpack   [Shift+{useKey}] sell the crew storage at market prices";
+                case "lightpole": return "";
             }
             return "";
         }

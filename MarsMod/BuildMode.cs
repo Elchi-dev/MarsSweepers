@@ -225,7 +225,22 @@ namespace MarsMod
 
             bool armed = removeArmedId == b.Id && now < removeArmedUntil;
             string remove = b.Vanilla ? "" : armed ? "   <color=#FF6B5A>[Delete] again to remove</color>" : "   [Delete] remove";
-            promptBox.Set(Buildings.Describe(b) + "\n<size=18><color=#C9B8A8>" + Buildings.Hint(b, UseLabel()) + remove + "</color></size>");
+            bool scrub = Buildings.Jams(b) && b.Dust >= 0.3f;
+            bool held = kb.GetKey(KeyCode.E) || kb.GetKey(KeyCode.F);
+            if (scrub && held && cleanId == b.Id) cleanHeld += Time.deltaTime; else cleanHeld = 0f;
+            cleanId = b.Id;
+            string bar = "";
+            if (scrub && cleanHeld > 0f)
+            {
+                int filled = Mathf.Clamp(Mathf.RoundToInt(cleanHeld / Buildings.CleanSeconds * 20f), 0, 20);
+                bar = "\n<color=#7FD8F0>" + new string('█', filled) + "</color><color=#5A524C>" + new string('█', 20 - filled) + "</color>";
+            }
+            promptBox.Set(Buildings.Describe(b) + Buildings.DustLine(b) + "\n<size=18><color=#C9B8A8>" + Buildings.Hint(b, UseLabel()) + remove + "</color></size>" + bar);
+            if (scrub)
+            {
+                if (cleanHeld >= Buildings.CleanSeconds) { int cid = b.Id; Buildings.Ask(Buildings.Op.Clean, w => w.Write(cid)); cleanHeld = 0f; }
+                return;
+            }
 
             bool use = false;
             try { use = MoonInput.Interact.Pressed; } catch { }
@@ -243,6 +258,8 @@ namespace MarsMod
             }
         }
 
+        static int cleanId = -1;
+        static float cleanHeld;
         static string useLabel;
         static string UseLabel()
         {
