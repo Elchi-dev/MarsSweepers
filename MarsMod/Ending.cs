@@ -74,7 +74,12 @@ namespace MarsMod
             if (!playing || Time.realtimeSinceStartup - startedAt < 5f) return;
             bool running = false;
             try { running = MoonEnding.Playing; } catch { }
-            if (!running) Reset();
+            if (!running)
+            {
+                Reset();
+                MarsWorld.Urgent("The Moon had it coming. Thanks for playing Mars Sweepers.");
+                MarsWorld.Notice("Mars Sweepers, made by Elchi. Mars keeps going: the dust never stops.");
+            }
         }
     }
 }
