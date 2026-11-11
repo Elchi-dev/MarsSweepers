@@ -61,6 +61,8 @@ plugin). Newest first.
 - Every Mars building is driven by its catalogue entry (MarsItems.cs):
   one place for prices, recipes, power and item costs.
 - Removing all modding also puts the game's own dstorage.dll back.
+- Scrubbing a jammed machine gets faster with the game's cleaning width
+  upgrades (up to three times).
 
 ## 0.9.16
 

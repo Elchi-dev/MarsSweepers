@@ -382,7 +382,22 @@ namespace MarsMod
         }
 
         public const float JamSeconds = 75f;      // a full storm jams an unprotected machine in this time
-        public const float CleanSeconds = 3.5f;   // holding E this long scrubs a machine
+        public const float BaseCleanSeconds = 3.5f;   // holding E this long scrubs a machine (before upgrades)
+        static float cleanCached = BaseCleanSeconds, cleanCheckedAt = -10f;
+
+        /// <summary>Scrubbing gets faster with the game's cleaning width upgrades.</summary>
+        public static float CleanSeconds
+        {
+            get
+            {
+                float now = Time.realtimeSinceStartup;
+                if (now - cleanCheckedAt < 5f) return cleanCached;
+                cleanCheckedAt = now;
+                try { cleanCached = BaseCleanSeconds / Mathf.Clamp(Commands.FindWorld().CleaningWidthMultiplier(Me), 1f, 3f); }
+                catch { cleanCached = BaseCleanSeconds; }
+                return cleanCached;
+            }
+        }
 
         public static bool Jams(Rec b) => MarsCatalog.Get(b.Type)?.Jams ?? false;
         public static bool Jammed(Rec b) => b.Dust >= 1f;

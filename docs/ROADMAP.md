@@ -25,7 +25,7 @@ window.
 
 ## Later
 
-- Storms jam belts too; scrubbing gets faster with upgrades.
+- Storms jam belts too.
 - Gates that read prices from the market board.
 - More alien offers, and outposts that move after a while.
 
