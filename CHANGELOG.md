@@ -15,7 +15,8 @@ plugin). Newest first.
 - Shield generator. When a storm comes and it has its full 30 kW, it raises
   a dome. What it covers is a flood fill over the ground (2 m cells, up to
   28 m, stopped by walls, cliffs and pits). Under the dome the air is clear,
-  dust does not settle on machines and solar panels get full sun.
+  dust does not settle on machines and solar panels get full sun. Looking
+  at a shield generator shows the covered ground as glowing tiles.
 - Second production chain: crusher (basalt to grit), fiber spinner (grit to
   basalt fiber), assembler (iron plates and fiber to machine parts).
 - Water ice mines near the poles, electrolyzer (ice to oxygen and hydrogen)

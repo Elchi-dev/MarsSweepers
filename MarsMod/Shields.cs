@@ -21,12 +21,13 @@ namespace MarsMod
         {
             public Vector3 Center, Up, East, North;
             public HashSet<long> Cells = new HashSet<long>();
-            public GameObject Dome;
+            public List<Vector3> Ground = new List<Vector3>();     // the covered cells' ground points, for the floor overlay
+            public GameObject Dome, Floor;
             public float Shown;
         }
 
         static readonly Dictionary<int, Coverage> cover = new Dictionary<int, Coverage>();
-        static Material domeMat;
+        static Material domeMat, floorMat;
         static int previewId = -1;
         static float previewUntil;
 
@@ -60,7 +61,7 @@ namespace MarsMod
         {
             if (cover.TryGetValue(b.Id, out var c) && (c.Center - b.Pos).sqrMagnitude < 0.25f) return c;
             try { c = Fill(b.Pos); } catch (Exception e) { Log.Once("shield-fill", "[shield] coverage failed: " + e.Message); return null; }
-            if (cover.TryGetValue(b.Id, out var old) && old.Dome != null) UnityEngine.Object.Destroy(old.Dome);
+            if (cover.TryGetValue(b.Id, out var old)) { if (old.Dome != null) UnityEngine.Object.Destroy(old.Dome); if (old.Floor != null) UnityEngine.Object.Destroy(old.Floor); }
             cover[b.Id] = c;
             Plugin.Log.LogMessage($"[shield] #{b.Id} covers {c.Cells.Count} cells ({c.Cells.Count * Cell * Cell:0} m²)");
             return c;
@@ -80,7 +81,7 @@ namespace MarsMod
             }
             var q = new Queue<(int x, int y, Vector3 g)>();
             q.Enqueue((0, 0, Ground(0, 0)));
-            c.Cells.Add(Key(0, 0));
+            c.Cells.Add(Key(0, 0)); c.Ground.Add(Ground(0, 0));
             int max = (int)(Radius / Cell);
             var steps = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) };
             while (q.Count > 0)
@@ -96,7 +97,7 @@ namespace MarsMod
                     var up = g.normalized;
                     var dir = (ng - g); float len = dir.magnitude;
                     if (len > 0.01f && Shelter.Ray(g + up * 1.2f, dir / len, len, out _)) continue;   // a wall between the cells
-                    c.Cells.Add(Key(nx, ny));
+                    c.Cells.Add(Key(nx, ny)); c.Ground.Add(ng);
                     q.Enqueue((nx, ny, ng));
                 }
             }
@@ -113,7 +114,18 @@ namespace MarsMod
                 if (c == null) continue;
                 float target = b.Active ? 1f : b.Id == previewId && Time.realtimeSinceStartup < previewUntil ? 0.45f : 0f;
                 c.Shown = Mathf.MoveTowards(c.Shown, target, dt * 1.2f);
-                if (c.Shown <= 0.001f) { if (c.Dome != null && c.Dome.activeSelf) c.Dome.SetActive(false); continue; }
+                if (c.Shown <= 0.001f)
+                {
+                    if (c.Dome != null && c.Dome.activeSelf) c.Dome.SetActive(false);
+                    if (c.Floor != null && c.Floor.activeSelf) c.Floor.SetActive(false);
+                    continue;
+                }
+                if (c.Floor == null) c.Floor = MakeFloor(c);
+                if (c.Floor != null)
+                {
+                    if (!c.Floor.activeSelf) c.Floor.SetActive(true);
+                    floorMat.color = new Color(0.45f, 0.85f, 1f, 0.22f * c.Shown);
+                }
                 if (c.Dome == null) c.Dome = MakeDome(c);
                 if (c.Dome == null) continue;
                 if (!c.Dome.activeSelf) c.Dome.SetActive(true);
@@ -122,7 +134,53 @@ namespace MarsMod
                 domeMat.color = col;
             }
             foreach (var id in cover.Keys.ToList())
-                if (!Buildings.Data.List.Any(b => b.Id == id)) { if (cover[id].Dome != null) UnityEngine.Object.Destroy(cover[id].Dome); cover.Remove(id); }
+                if (!Buildings.Data.List.Any(b => b.Id == id))
+                {
+                    if (cover[id].Dome != null) UnityEngine.Object.Destroy(cover[id].Dome);
+                    if (cover[id].Floor != null) UnityEngine.Object.Destroy(cover[id].Floor);
+                    cover.Remove(id);
+                }
+        }
+
+        /// <summary>The covered ground as flat tiles a little above it: what the flood fill found.</summary>
+        static GameObject MakeFloor(Coverage c)
+        {
+            try
+            {
+                if (floorMat == null)
+                {
+                    var sh = Shader.Find("Sprites/Default") ?? Shader.Find("Universal Render Pipeline/Unlit");
+                    floorMat = new Material(sh) { name = "Mars shield floor" };
+                    Haze.SetupUnlitTransparent(floorMat);
+                    floorMat.renderQueue = 3040;
+                    UnityEngine.Object.DontDestroyOnLoad(floorMat);
+                }
+                var v = new List<Vector3>(); var t = new List<int>();
+                float h = Cell * 0.46f;
+                foreach (var g in c.Ground)
+                {
+                    var up = g.normalized;
+                    var p = g + up * 0.12f - c.Center;
+                    int i = v.Count;
+                    v.Add(p - c.East * h - c.North * h); v.Add(p + c.East * h - c.North * h);
+                    v.Add(p + c.East * h + c.North * h); v.Add(p - c.East * h + c.North * h);
+                    t.Add(i); t.Add(i + 2); t.Add(i + 1); t.Add(i); t.Add(i + 3); t.Add(i + 2);
+                }
+                var mesh = new Mesh { name = "Mars shield floor" };
+                if (v.Count > 65000) mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                mesh.vertices = v.ToArray();
+                mesh.triangles = t.ToArray();
+                mesh.RecalculateBounds();
+                var go = new GameObject(); go.name = "Mars shield floor";
+                go.AddComponent(Il2CppType.Of<MeshFilter>()).Cast<MeshFilter>().sharedMesh = mesh;
+                var mr = go.AddComponent(Il2CppType.Of<MeshRenderer>()).Cast<MeshRenderer>();
+                mr.sharedMaterial = floorMat;
+                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                mr.receiveShadows = false;
+                go.transform.position = c.Center;
+                return go;
+            }
+            catch (Exception e) { Log.Once("shield-floor", "[shield] floor failed: " + e.Message); return null; }
         }
 
         static Mesh hemi;
@@ -185,7 +243,7 @@ namespace MarsMod
 
         public static void Clear()
         {
-            foreach (var c in cover.Values) if (c.Dome != null) UnityEngine.Object.Destroy(c.Dome);
+            foreach (var c in cover.Values) { if (c.Dome != null) UnityEngine.Object.Destroy(c.Dome); if (c.Floor != null) UnityEngine.Object.Destroy(c.Floor); }
             cover.Clear();
         }
     }
