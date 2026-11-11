@@ -93,6 +93,7 @@ namespace MarsMod
             try { Text.Frame(now); }
             catch (Exception e) { Log.Once("text-frame", "Mars text pass failed: " + e.Message); }
 
+            try { Economy.Tick(now); } catch { }
             try { VanillaBuild.Frame(); } catch (Exception e) { Log.Once("vbuild-frame", "Mars build menu: " + e.Message); }
             // Every frame while on Mars: buildings, the build menu, and the haze following the camera.
             if (marsWorld)
