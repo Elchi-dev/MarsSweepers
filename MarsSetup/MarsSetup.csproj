@@ -10,7 +10,7 @@
     <Nullable>disable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <Version>0.9.14</Version>
+    <Version>0.9.15</Version>
     <Product>Mars Sweepers setup</Product>
     <Description>Installs BepInEx, the MoonSweepers BepInEx Patcher and the MarsProbe debug mod into Moon Sweepers.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -32,6 +32,7 @@
     <EmbeddedResource Include="..\MarsProbe\bin\Release\net6.0\MarsProbe.dll" LogicalName="MarsProbe.dll" />
     <EmbeddedResource Include="..\MarsMod\bin\Release\net6.0\MarsMod.dll" LogicalName="MarsMod.dll" />
     <EmbeddedResource Include="..\assets\voice.zip" LogicalName="voice.zip" />
+    <EmbeddedResource Include="..\native\dstorage-proxy\out\dstorage.dll" LogicalName="dstorage-proxy.dll" />
   </ItemGroup>
 
 </Project>

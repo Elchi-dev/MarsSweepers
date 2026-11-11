@@ -6,6 +6,7 @@ cd "$(dirname "$0")/.."
 for f in lib/BepInEx.Core.dll lib/Il2Cppmscorlib.dll lib/interop/Assembly-CSharp.dll lib/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.791.zip; do
   [ -f "$f" ] || { echo "missing $f, see lib/README.md" >&2; exit 1; }
 done
+./native/dstorage-proxy/build.sh >/dev/null
 dotnet build MarsProbe -c Release -nologo -v q
 dotnet build MarsMod -c Release -nologo -v q
 dotnet build MarsSetup -c Release -nologo -v q

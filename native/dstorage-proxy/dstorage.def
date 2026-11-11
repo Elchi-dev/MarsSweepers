@@ -1,0 +1,6 @@
+LIBRARY dstorage
+EXPORTS
+    DStorageCreateCompressionCodec=dstorage_original.DStorageCreateCompressionCodec
+    DStorageGetFactory=dstorage_original.DStorageGetFactory
+    DStorageSetConfiguration=dstorage_original.DStorageSetConfiguration
+    DStorageSetConfiguration1=dstorage_original.DStorageSetConfiguration1

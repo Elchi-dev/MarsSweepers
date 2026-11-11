@@ -3,6 +3,17 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.15
+
+### Added
+- Setup option [15], undone by [16]: starts BepInEx through dstorage.dll.
+  Switching PreferSystem32 off for the exe did not change the running game
+  (2026-11-11 22:37 report; others see the same since a Windows 11 update).
+  dstorage.dll has no copy in System32, so Windows takes it from the game
+  folder even with that rule. `native/dstorage-proxy` forwards every
+  DirectStorage function to the game's own file (dstorage_original.dll)
+  and loads Doorstop from BepInEx/doorstop by its full path.
+
 ## 0.9.14
 
 ### Fixed
