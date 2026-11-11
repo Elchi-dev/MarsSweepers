@@ -99,7 +99,7 @@ namespace MarsMod
 
             // Visibility: clear Mars air ~1.4 km (HazeStrength 0.5), a full storm ~9 m.
             float clearL = 700f / Mathf.Max(0.05f, MarsProfile.HazeStrength.Value);
-            float s = Storm * (1f - 0.8f * LightPoles.Clear(camPos));
+            float s = Storm * (1f - 0.8f * LightPoles.Clear(camPos)) * (Shields.Covered(camPos) ? 0.08f : 1f);
             Visibility = Mathf.Exp(Mathf.Lerp(Mathf.Log(clearL), Mathf.Log(9f), Mathf.Pow(s, 0.8f)));
             float L = Visibility;
 

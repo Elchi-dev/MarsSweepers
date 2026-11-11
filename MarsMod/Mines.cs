@@ -24,6 +24,8 @@ namespace MarsMod
         }
 
         public static readonly List<Mine> All = new List<Mine>();
+        /// <summary>Where the alien traders land (worked out with the mines, the same on every PC).</summary>
+        public static readonly List<(Vector3 pos, Quaternion rot)> AlienSites = new List<(Vector3, Quaternion)>();
         static int builtForSeed = int.MinValue;
         const int Count = 36;
 
@@ -42,6 +44,7 @@ namespace MarsMod
         {
             foreach (var m in All) if (m.View != null) UnityEngine.Object.Destroy(m.View);
             All.Clear();
+            AlienSites.Clear();
             builtForSeed = int.MinValue;
         }
 
@@ -68,6 +71,7 @@ namespace MarsMod
             }
 
             // 1. Home mine: on a ring 34-60 m around the main Collector, the flattest reachable spot.
+            DustTiers.Setup(home, seed);
             var rnd = new System.Random(seed);
             {
                 var up = home.normalized;
@@ -102,16 +106,37 @@ namespace MarsMod
                 if (stations.Any(s => Vector3.Distance(s, p) < 80f)) continue;
                 if (All.Any(m => Vector3.Distance(m.Position, p) < 160f)) continue;
                 if (Slope(dir, 3f) > 14f) continue;
+                if (Mathf.Abs(dir.y) > 0.72f) ore = "ice";      // the polar caps hold water ice
                 All.Add(new Mine { Id = All.Count, Position = p, Up = dir, Ore = ore });
             }
 
-            // 3. Views.
+            // 3. Alien trader outposts: 3 sites 250-900 m from the Collector, flat, away from mines and stations.
+            {
+                var ar = new System.Random(seed ^ 0x414C4945);
+                var up = home.normalized;
+                var e = Vector3.Cross(up, Vector3.forward); if (e.sqrMagnitude < 1e-4f) e = Vector3.right; e.Normalize();
+                var n = Vector3.Cross(up, e);
+                int at = 0;
+                while (AlienSites.Count < 3 && at++ < 600)
+                {
+                    float az = (float)(ar.NextDouble() * Math.PI * 2), r = 250f + (float)ar.NextDouble() * 650f;
+                    var dir = (home + (e * Mathf.Cos(az) + n * Mathf.Sin(az)) * r).normalized;
+                    var p = t.SurfacePoint(dir);
+                    if (Slope(dir, 4f) > 8f) continue;
+                    if (stations.Any(s0 => Vector3.Distance(s0, p) < 120f) || All.Any(m => Vector3.Distance(m.Position, p) < 60f)) continue;
+                    if (AlienSites.Any(x => Vector3.Distance(x.pos, p) < 300f)) continue;
+                    var fwd = Vector3.ProjectOnPlane(home - p, dir); if (fwd.sqrMagnitude < 1e-4f) fwd = Vector3.ProjectOnPlane(Vector3.right, dir);
+                    AlienSites.Add((p, Quaternion.LookRotation(fwd.normalized, dir)));
+                }
+            }
+
+            // 4. Views.
             foreach (var m in All)
             {
                 float yaw = (m.Id * 137.5f) % 360f;
                 var fwd = Vector3.ProjectOnPlane(Vector3.forward, m.Up); if (fwd.sqrMagnitude < 1e-4f) fwd = Vector3.ProjectOnPlane(Vector3.right, m.Up);
                 var rot = Quaternion.AngleAxis(yaw, m.Up) * Quaternion.LookRotation(fwd.normalized, m.Up);
-                m.View = Models.Spawn("mine", m.Position - m.Up * 0.12f, rot);
+                m.View = Models.Spawn(m.Ore == "ice" ? "mine_ice" : "mine", m.Position - m.Up * 0.12f, rot);
                 m.View.name = $"Mars mine {m.Id} ({m.Ore})";
             }
             Plugin.Log.LogMessage($"[mines] {All.Count} mines (home mine {(All.Count > 0 && All[0].Home ? Vector3.Distance(All[0].Position, home).ToString("0") + " m from the Collector" : "missing")})");

@@ -15,7 +15,7 @@ namespace MarsMod
     public class Plugin : BasePlugin
     {
         public const string Guid = "marsmod.mars";
-        public const string Version = "0.9.16";
+        public const string Version = "0.10.0";
 
         internal static new ManualLogSource Log;
         /// <summary>The previous start crashed before the mod's first frame: load only the essentials.</summary>
@@ -36,6 +36,7 @@ namespace MarsMod
             MarsData.Init();
             Buildings.Init();
             Market.Init();
+            Ending.Init();
             Guard.Init();
             SafeMode = Guard.StartupCrashed();
             Guard.Begin("startup");

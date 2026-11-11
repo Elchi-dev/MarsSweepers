@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using MoonCleaners;
 using UnityEngine;
 
@@ -10,7 +11,24 @@ namespace MarsMod
     /// </summary>
     internal static class Sky
     {
-        static Texture2D phobos;
+        static Texture2D phobos, moon;
+
+        /// <summary>For the ending: the sky shows the Moon (grey, with dark maria) where Phobos was.</summary>
+        public static bool ShowMoon(bool on)
+        {
+            try
+            {
+                var s = Look.All<MoonSolarSystem>().FirstOrDefault(x => Look.InScene(x.gameObject));
+                var sky = s?.runtimeSky;
+                if (sky == null || !sky.HasProperty("_Earth")) return false;
+                if (on && moon == null) moon = MakeBody(1969, 30, 0.62f, 0.62f, 0.64f, true, "The Moon (Mars mod)");
+                var tex = on ? moon : phobos;
+                if (tex == null) return false;
+                sky.SetTexture("_Earth", tex);
+                return true;
+            }
+            catch (Exception e) { Log.Once("sky-moon", "[sky] moon swap failed: " + e.Message); return false; }
+        }
 
         public static void Apply(MoonSolarSystem s)
         {
@@ -18,7 +36,7 @@ namespace MarsMod
             if (sky == null) return;
             Look.DumpProps(sky, "Sky material");
             if (!sky.HasProperty("_Earth")) return;
-            if (phobos == null) phobos = MakePhobos();
+            if (phobos == null) phobos = MakeBody(1877, 40, 0.46f, 0.40f, 0.36f, false, "Phobos (Mars mod)");
             if (phobos != null && sky.GetTexture("_Earth") != phobos)
             {
                 sky.SetTexture("_Earth", phobos);
@@ -26,7 +44,7 @@ namespace MarsMod
             }
         }
 
-        static Texture2D MakePhobos()
+        static Texture2D MakeBody(int seed, int craterCount, float cr, float cg, float cb, bool maria, string name)
         {
             try
             {
@@ -35,12 +53,12 @@ namespace MarsMod
                 var ctor = typeof(Texture2D).GetConstructor(new[] { typeof(int), typeof(int), typeof(TextureFormat), typeof(bool) });
                 if (ctor == null) { Log.Once("phobos-err", "Texture2D constructor not found"); return null; }
                 var tex = (Texture2D)ctor.Invoke(new object[] { W, H, TextureFormat.RGBA32, false });
-                tex.name = "Phobos (Mars mod)";
+                tex.name = name;
                 tex.wrapMode = TextureWrapMode.Repeat;
-                var rnd = new System.Random(1877); // Phobos was discovered in 1877
+                var rnd = new System.Random(seed);
                 // A few craters on the sphere, given as (longitude, latitude, radius in radians, depth).
-                var craters = new (float lon, float lat, float r, float d)[40];
-                craters[0] = (0.4f, 0.1f, 0.55f, 0.55f); // Stickney
+                var craters = new (float lon, float lat, float r, float d)[craterCount];
+                craters[0] = maria ? (2.2f, -0.6f, 0.3f, 0.5f) : (0.4f, 0.1f, 0.55f, 0.55f); // Tycho-like / Stickney
                 for (int i = 1; i < craters.Length; i++)
                     craters[i] = ((float)(rnd.NextDouble() * Math.PI * 2), (float)((rnd.NextDouble() - 0.5) * Math.PI * 0.9),
                                   (float)(0.04 + rnd.NextDouble() * 0.16), (float)(0.15 + rnd.NextDouble() * 0.3));
@@ -62,8 +80,9 @@ namespace MarsMod
                             if (t < 1f) shade -= c.d * (1f - t * t) * 0.6f;             // bowl
                             else shade += c.d * 0.35f * (1f - (t - 1f) / 0.25f);        // bright rim
                         }
+                        if (maria) shade -= 0.28f * Mathf.Clamp01(Noise(p * 1.6f + Vector3.one * 7f) * 3f + 0.2f);   // dark seas
                         shade = Mathf.Clamp01(shade);
-                        tex.SetPixel(x, y, new Color(0.46f * shade + 0.05f, 0.40f * shade + 0.04f, 0.36f * shade + 0.03f, 1f));
+                        tex.SetPixel(x, y, new Color(cr * shade + 0.05f, cg * shade + 0.04f, cb * shade + 0.03f, 1f));
                     }
                 }
                 tex.Apply(false, false);

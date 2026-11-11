@@ -29,6 +29,7 @@ namespace MarsMod
             Section = 5,        // host → crew: one changed section of the Mars data
             Request = 6,        // crew → host: please do something (feature-specific payload)
             Notice = 7,         // host → one player: a message for their HUD
+            Ending = 8,         // host → crew: the planet cannon fired, play the ending
         }
 
         static readonly Dictionary<Kind, Action<ulong, BinaryReader>> handlers = new Dictionary<Kind, Action<ulong, BinaryReader>>();

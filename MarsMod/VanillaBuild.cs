@@ -311,6 +311,8 @@ namespace MarsMod
         static string Rule(int kind, Vector3 pos)
         {
             var e = ByKind(kind);
+            string missing = e != null ? Buildings.MissingItems(e.Def) : null;
+            if (missing != null) return missing;
             if (e != null && e.Def.NeedsMine)
             {
                 var m = Mines.Nearest(pos, 6f);

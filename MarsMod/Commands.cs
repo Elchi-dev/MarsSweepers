@@ -26,9 +26,11 @@ namespace MarsMod
             ("model <name> | model list | model clear", "place a Mars model in front of you (look test of the Blender models)"),
             ("money [amount]", "CHEAT: add money (default $10,000)"),
             ("unlock", "CHEAT: buy every upgrade in the upgrade tree for free"),
-            ("give <item> [count]", "CHEAT: put Mars items in your backpack (hematite, basalt, iron_plate)"),
+            ("give <item> [count]", "CHEAT: put Mars items in your backpack (give alone lists them)"),
+            ("power", "every power grid: what it makes, uses and stores"),
+            ("ending", "CHEAT (host): play the Mars ending now, the Moon in the sky gets it"),
             ("freebuild [on|off] | fastmachines <x>", "CHEAT: Mars buildings cost nothing / machines run x times faster"),
-            ("build <drill|smelter|container> | buildings", "place a Mars building directly / list all of them"),
+            ("build <id> | buildings", "place a Mars building directly / list all of them"),
             ("mines | tp mine [id]", "list the nearest mines / teleport to one"),
             ("research", "study the game's machines and build menu, render reference pictures (for new Mars machines)"),
             ("collect", "write everything needed for the next features: economy, belts, machines, power, a snapshot"),
@@ -99,6 +101,8 @@ namespace MarsMod
                     say($"{Buildings.Data.List.Count} Mars building(s). Crew storage: {MarsItems.List(Buildings.Items.Storage)}");
                     foreach (var l in VanillaBuild.Status()) say(l);
                     break;
+                case "ending": if (!MarsNet.IsHost) { say("Only the host can start the ending."); break; } Ending.Fire(); say("Ending in " + Ending.Countdown + " s (cheat: no cannon needed)."); break;
+                case "power": foreach (var l in Power.Report()) say(l); break;
                 case "mines":
                 {
                     var w0 = FindWalker(); var p0 = w0 != null ? w0.transform.position : Vector3.zero;

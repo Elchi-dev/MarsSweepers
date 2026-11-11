@@ -63,6 +63,9 @@ namespace MarsMod
             Patch(AccessTools.Method(typeof(MoonDepotSave), "Write"), pre: nameof(SaveWrite_Pre), post: nameof(SaveWrite_Post));
             Patch(AccessTools.Method(typeof(MoonWorld), "RestoreDepots"), pre: nameof(RestoreDepots_Pre));
 
+            // --- dust tiers: the bonus on top of the game's sector bounty (private void (int, string))
+            Patch(AccessTools.Method(typeof(MoonWorld), "PaySection", new[] { typeof(int), typeof(string) }), pre: nameof(PaySection_Pre), post: nameof(PaySection_Post));
+
             // --- our per-frame tick rides on two game components that live for the whole session
             Patch(AccessTools.Method(typeof(MoonCrashHeartbeat), "Update"), post: nameof(Frame_Post));
             Patch(AccessTools.Method(typeof(MoonFramePacer), "Update"), post: nameof(Frame_Post));
@@ -141,6 +144,9 @@ namespace MarsMod
         {
             try { if (VanillaBuild.Block != null && __instance.ghostKind == VanillaBuild.GhostKind) __result = VanillaBuild.Block; } catch { }
         }
+
+        static void PaySection_Pre(MoonWorld __instance, string __1, out double __state) => __state = MarsWorld.InMarsWorld ? DustTiers.Before(__instance, __1) : double.NaN;
+        static void PaySection_Post(MoonWorld __instance, int __0, string __1, double __state) => DustTiers.After(__instance, __0, __1, __state);
 
         static void SaveWrite_Pre(MoonLooseDustSnapshot __1, out VanillaBuild.Taken __state)
         {
