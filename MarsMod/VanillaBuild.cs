@@ -311,6 +311,7 @@ namespace MarsMod
         static string Rule(int kind, Vector3 pos)
         {
             var e = ByKind(kind);
+            if (Buildings.Data.List.Any(o => o.Owner == Aliens.Owner && (o.Pos - pos).sqrMagnitude < 8f * 8f)) return "Too close to the alien outpost";
             string missing = e != null ? Buildings.MissingItems(e.Def) : null;
             if (missing != null) return missing;
             if (e != null && e.Def.NeedsMine)
