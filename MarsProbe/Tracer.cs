@@ -24,6 +24,7 @@ namespace MarsProbe
             "Rpc", "Cmd", "Receive", "Send", "Craft", "Produce", "Deposit", "Unload", "Catch", "Fire",
             "Pack", "Clean", "Sweep", "Collect", "Pickup", "PickUp", "Equip", "Enter", "Exit", "Sleep", "Wake",
             "Generate", "Create", "Init", "Setup", "SetUp", "Start", "Begin", "Region", "Sector",
+            "Belt", "Conveyor", "Machine", "Cargo", "Power", "Grid", "Charge", "Process", "Packager", "Canister",
         };
         static readonly HashSet<string> Excluded = new HashSet<string> { "Update", "LateUpdate", "FixedUpdate", "OnGUI", "OnDrawGizmos", "OnRenderObject", "OnValidate" };
         /// <summary>Called thousands of times per second in the first report: not worth the overhead.</summary>
