@@ -32,6 +32,8 @@ namespace MarsSetup
                 lock (Lines) Lines.Clear();
                 L("checked " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                 Files();
+                foreach (var c in CompatFindings()) L("windows setting: " + c);
+                if (CompatFindings().Count == 0) L("no compatibility layer, no compatibility assistant record and no image options for the game exe");
                 WindowsFacts();
                 Policy();
                 CodeIntegrity();
@@ -260,6 +262,7 @@ namespace MarsSetup
                     var mods = p.Modules.Cast<ProcessModule>().Select(m => m.FileName).ToList();
                     lastMods[pid] = mods;
                     if (!report) return true;
+                    L($"process {pid} image load policy: {ImageLoadPolicy(p)}");
                     string win = mods.FirstOrDefault(m => Path.GetFileName(m).Equals("winhttp.dll", StringComparison.OrdinalIgnoreCase));
                     string clr = mods.FirstOrDefault(m => Path.GetFileName(m).Equals("coreclr.dll", StringComparison.OrdinalIgnoreCase));
                     L($"process {pid}: winhttp.dll loaded from {(win ?? "nowhere")}; coreclr.dll {(clr ?? "NOT loaded (BepInEx's .NET did not start)")}; {mods.Count} modules");

@@ -75,6 +75,7 @@ namespace MarsSetup
                             break;
                         case "2":
                             if (!ModCurrent() || !File.Exists(ProbePath)) { Info("This setup carries a newer Mars mod: installing it first."); if (!Install()) break; }
+                            FixCompat();
                             RunAndCollect();
                             break;
                         case "3": Collect(); break;
@@ -110,7 +111,7 @@ namespace MarsSetup
   | |\/| |/ _` | '__/ __| \___ \ \ /\ / / _ \/ _ \ '_ \ / _ \ '__/ __|
   | |  | | (_| | |  \__ \  ___) \ V  V /  __/  __/ |_) |  __/ |  \__ \
   |_|  |_|\__,_|_|  |___/ |____/ \_/\_/ \___|\___| .__/ \___|_|  |___/
-                                                 |_|   setup v0.9.8   ");
+                                                 |_|   setup v0.9.9   ");
             Console.ResetColor();
         }
 
@@ -275,6 +276,7 @@ namespace MarsSetup
             Line("Interop files (made on first start)", interop ? "generated" : "not yet", interop);
             Line("MarsProbe report", Directory.Exists(P("MarsProbe", "Report")) ? "exists" : "none yet", Directory.Exists(P("MarsProbe", "Report")));
             foreach (var w in LoaderProblems()) Warn(w);
+            foreach (var c in CompatFindings()) Warn("Windows setting on the game: " + c + " (pick [1] to remove it)");
             if (GameRunning()) Warn("Moon Sweepers is running right now.");
         }
 
@@ -454,6 +456,7 @@ namespace MarsSetup
             if (!WaitForGameClosed()) return false;
 
             BackupSaves();
+            FixCompat();
 
             // ---- BepInEx
             bool haveBep = File.Exists(BepCore);
@@ -777,7 +780,7 @@ namespace MarsSetup
             Diagnose.Watch();
 
             Console.WriteLine();
-            Head("Mars 0.9.8: one test round for everything");
+            Head("Mars 0.9.9: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
             Info(" MOON first (your most built-up Moon world, with belts, packager, press and solar if you have them):");

@@ -3,6 +3,18 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.9.9
+
+### Fixed
+- Windows settings attached to MoonSweepers.exe that make it load
+  winhttp.dll and version.dll from System32 instead of the game folder
+  (a compatibility layer, a Program Compatibility Assistant record, Image
+  File Execution Options) are shown in the status, saved to a file and
+  removed by [1] and [2]. The shim engine (apphelp.dll) was loaded into the
+  game right before UnityPlayer.dll in the 2026-11-11 reports, and the game
+  got Windows' copies of both DLLs while the game folder held Doorstop.
+- The diagnosis reads the image load policy of the running game.
+
 ## 0.9.8
 
 ### Fixed
