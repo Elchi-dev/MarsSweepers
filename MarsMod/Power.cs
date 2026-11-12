@@ -121,6 +121,11 @@ namespace MarsMod
                 foreach (var n in g.Nodes) n.Supply = supply;
                 foreach (var r in unpowered) r.Supply = 0f;
             }
+            if (Cheats.InfinitePower)
+            {
+                foreach (var r in recs) { r.Supply = 1f; var d = Get(r.Type); if (d != null && d.Battery > 0) r.Energy = d.Battery; }
+                return;
+            }
             // Consumers with no grid at all.
             foreach (var r in recs)
             {

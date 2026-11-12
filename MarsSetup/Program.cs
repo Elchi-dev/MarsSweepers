@@ -81,6 +81,7 @@ namespace MarsSetup
                     Console.WriteLine("  [14] FIX: switch off Windows' \"prefer system images\" rule for the game, then start it");
                     Console.WriteLine("  [15] FIX: start BepInEx through dstorage.dll (Windows has no copy of it), then start the game");
                     Console.WriteLine("  [16] Undo [15]: put the game's own dstorage.dll back");
+                    Console.WriteLine("  [17] Pack the game's code files (GameAssembly.dll + metadata) for the mod's analysis, onto the Desktop");
                     Console.WriteLine("  [0] Exit");
                     Console.Write("> ");
                     string c = (Console.ReadLine() ?? "").Trim();
@@ -110,6 +111,7 @@ namespace MarsSetup
                         case "14": FixPreferSystem32(); break;
                         case "15": UseDstorageRoute(); break;
                         case "16": UndoDstorageRoute(); break;
+                        case "17": PackGameCode(); break;
                         case "0": case "": return 0;
                     }
                 }
@@ -861,18 +863,15 @@ namespace MarsSetup
             Head("Mars 0.10.0: one test round for everything");
             Info(" FIRST CHECK: a black BepInEx console window must open next to the game. No window = no mods:");
             Info("   stay in the main menu for 30 s (I am looking at the game meanwhile), then quit and send the report.");
-            Info(" MOON first (a Moon world with running belts): play 2 minutes near the belts (belt research), 'collect'.");
-            Info(" Then MARS (empty slot, answer Mars, or load your Mars slot; 'mars slot 0' in the menu terminal):");
-            Info("  1. 'money 50000', 'freebuild' if you like. 'goals' shows the path; the box top right too.");
-            Info("  2. Build: drill on a mine, smelter, solar panel + battery near them ('power' shows the grid).");
-            Info("     'give basalt 30' and build crusher, spinner, assembler; feed them with E.");
-            Info("  3. 'tp ice', drill + electrolyzer + refinery there (needs machine parts in the crew storage).");
-            Info("  4. 'aliens', 'tp alien', trade (E / Shift+E). Look at a shield generator: blue tiles = covered ground.");
-            Info("  5. 'storm now' with a powered shield: dome up, no dust inside? After the storm: 'devil', 'meteor'.");
-            Info("     'ending' plays the ending (cheat), do it last.");
-            Info("  6. 'belts' next to a Mars machine. Then 'beltmode on' and lay a belt from a drill to the container port.");
-            Info("     Bonus: a game splitter on that belt, 'gate item hematite' next to it.");
-            Info("  7. 'economy', save, reload, quit. I'll build the report.");
+            Info(" MOON first (a Moon world with running belts): play 2 minutes near the belts, then 'belts' and 'collect'.");
+            Info(" Then MARS on a NEW empty slot (a test world; answer Mars): land, wait 10 s, open the terminal (Ctrl+Shift+K):");
+            Info("  1. 'selftest' and do not touch anything for about 8 minutes. It builds, feeds and runs every Mars");
+            Info("     building, calls a storm, a dust devil and a meteorite, trades with the aliens and renders every model.");
+            Info("  2. Then by hand: look at the buildings and press E on a few. 'beltmode on', lay a game belt from the drill");
+            Info("     to the container port; put a game splitter on it and type 'gate item hematite' next to it.");
+            Info("  3. Cheats to try: 'finishmoon', 'tp last', 'fill', 'fillstorage', 'infinitepower', 'jam', 'goal all'.");
+            Info("  4. Last: 'ending'. Then quit the game. I'll build the report.");
+            Info(" Optional, once: menu [17] packs the game's code files for analysis (send that zip too).");
             Info("Screenshots are very welcome, especially of the intro, the sky and a storm!");
             Console.WriteLine();
             var start = DateTime.Now;

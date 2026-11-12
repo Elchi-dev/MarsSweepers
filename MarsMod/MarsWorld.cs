@@ -99,8 +99,21 @@ namespace MarsMod
             // Every frame while on Mars: buildings, the build menu, and the haze following the camera.
             if (marsWorld)
             {
-                try { VanillaBuild.PlacementFrame(); Buildings.Tick(now, dt); Goals.Tick(now); Meteors.Tick(now); MarketBoards.Frame(now); Belts.Tick(now); Market.Tick(now); LightPoles.Tick(); Shields.Frame(dt); Ending.Frame(); Ending.After(); DustDevils.Frame(); if (Camera.main != null) { DustTiers.Frame(Camera.main.transform.position); DustDevils.Warn(Camera.main.transform.position); } BuildMode.Frame(now, dt); }
-                catch (Exception e) { Log.Once("build-frame", "Mars buildings: " + e); }
+                // Each part on its own: one that fails (logged once) must not stop the others.
+                void Part(string name, Action a) { try { a(); } catch (Exception e) { Log.Once("frame-" + name, $"Mars {name}: {e}"); } }
+                Part("placement", VanillaBuild.PlacementFrame);
+                Part("buildings", () => Buildings.Tick(now, dt));
+                Part("goals", () => Goals.Tick(now));
+                Part("meteors", () => Meteors.Tick(now));
+                Part("market boards", () => MarketBoards.Frame(now));
+                Part("belts", () => Belts.Tick(now));
+                Part("market", () => Market.Tick(now));
+                Part("light poles", LightPoles.Tick);
+                Part("shields", () => Shields.Frame(dt));
+                Part("ending", () => { Ending.Frame(); Ending.After(); });
+                Part("dust devils", DustDevils.Frame);
+                Part("tiers", () => { if (Camera.main != null) { DustTiers.Frame(Camera.main.transform.position); DustDevils.Warn(Camera.main.transform.position); } });
+                Part("build mode", () => BuildMode.Frame(now, dt));
                 try
                 {
                     Haze.Tick(dt, solar);
@@ -128,6 +141,7 @@ namespace MarsMod
             try { Models.Animate(dt); } catch { }
             MarsData.Tick(now);
             try { Research.Frame(); } catch (Exception e) { Log.Once("research-frame", "Research: " + e.Message); }
+            try { SelfTest.Frame(); } catch (Exception e) { Log.Once("selftest-frame", "Self test: " + e); }
             try { Logo.Tick(now, marsWorld); }
             catch (Exception e) { Log.Once("logo-tick", "Logo: " + e.Message); }
 

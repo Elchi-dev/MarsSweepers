@@ -68,10 +68,25 @@ plugin). Newest first.
   up by itself, no terminal. It installs for playing: no MarsProbe and no
   BepInEx console window. `MarsSetup.exe --dev` opens the old tester menu.
 
+- Test cheats (the game's own developer helpers plus Mars ones):
+  `finishmoon` cleans every sector but one (`tp last` goes there), `clean`,
+  `resetdust yes`, `fill`, `fillstorage`, `infinitepower`, `jam`/`unjam`,
+  `goal next|all`, `buildall`. All logged to research/cheats.txt.
+- `selftest`: an automatic test round on a test world. It builds one of
+  every Mars building, feeds and runs them, switches power, calls a storm, a
+  dust devil and a meteorite, presses E on everything, trades with the
+  aliens, checks tiers, belts and goals, and renders every model with the
+  game's materials. Everything goes to research/selftest.txt.
+- `research` renders the Mars buildings, the outpost, the meteorite and the
+  mines too.
+- MarsSetup --dev [17] packs the game's code files for analysis.
+
 ### Changed
 - Every Mars building is driven by its catalogue entry (MarsItems.cs):
   one place for prices, recipes, power and item costs.
 - Removing all modding also puts the game's own dstorage.dll back.
+- The Mars frame loop runs every part on its own, so one failing part (it
+  is logged once) no longer stops the others.
 - Scrubbing a jammed machine gets faster with the game's cleaning width
   upgrades (up to three times).
 

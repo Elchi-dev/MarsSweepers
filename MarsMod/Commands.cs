@@ -65,10 +65,11 @@ namespace MarsMod
             Plugin.Log.LogInfo("[terminal] > " + line);
             string c = a[0].ToLowerInvariant();
             string Arg(int i) => i < a.Length ? a[i].ToLowerInvariant() : "";
+            if (Cheats.Command(c, a, say)) return;
             switch (c)
             {
                 case "help": case "?":
-                    foreach (var (u, w) in Help) say($"  {u,-58} {w}");
+                    foreach (var (u, w) in Help.Concat(Cheats.Help)) say($"  {u,-58} {w}");
                     say("Ctrl+Shift+K or Esc closes the terminal. Up/Down = history, Left/Right/Home/End move the cursor (Ctrl = by word),");
                     say("Ctrl+V paste, Ctrl+C copy the line (empty line: the last answer), Ctrl+Shift+C copy everything, Ctrl+L clear.");
                     break;
@@ -475,6 +476,12 @@ namespace MarsMod
                 else m = Mines.All.OrderBy(x => Vector3.Distance(x.Position, p)).FirstOrDefault();
                 if (m == null) { say("No such mine (are mines generated yet? try 'mines')."); return; }
                 target = m.Position + m.Up * 4f + Vector3.Cross(m.Up, Vector3.right).normalized * 5f;
+            }
+            else if (mode == "last")
+            {
+                if (Cheats.LastRegion == null) { say("No last sector yet: 'finishmoon' first."); return; }
+                var lr = Cheats.LastRegion.Value;
+                target = lr + lr.normalized * 3f;
             }
             else if (mode == "alien" || mode == "aliens" || mode == "outpost" || mode == "ice")
             {

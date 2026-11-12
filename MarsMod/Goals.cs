@@ -105,6 +105,21 @@ namespace MarsMod
         /// <summary>Shown once when a Mars world opens.</summary>
         public static void Opened() { shownDone = Data.Done; MarsWorld.Notice(Current()); }
 
+        /// <summary>Cheat (host): finish goals until this many are done, paying their bonuses.</summary>
+        public static string ForceTo(int target)
+        {
+            var done = new List<string>();
+            while (Data.Done < All.Length && Data.Done < target)
+            {
+                var g = All[Data.Done];
+                if (g.Reward > 0) Buildings.Earn(Commands.FindWorld(), Buildings.Me, g.Reward);
+                done.Add(g.Text);
+                Data.Done++;
+            }
+            MarsData.Set(Key, Data);
+            return done.Count == 0 ? "No goal left." : "Goals done: " + string.Join("; ", done);
+        }
+
         public static void Reset() { Data = new State(); shownDone = -1; dirty = false; }
     }
 }

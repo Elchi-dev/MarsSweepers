@@ -38,7 +38,7 @@ namespace MarsMod
             int found = 0;
 
             defs.AppendLine("# kind → definition (from MoonWorld.BuildDefinition)");
-            foreach (int k in Enumerable.Range(0, MoonDepotSave.MaxStructureKind + 1).Concat(new[] { MoonPlacementKinds() }))
+            foreach (int k in Enumerable.Range(0, MoonDepotSave.MaxStructureKind + 1).Concat(new[] { MoonPlacementKinds() }).Concat(VanillaBuild.Entries.Select(e => e.Kind)))
             {
                 MoonDepotBuildDefinition d = null;
                 try { d = world.BuildDefinition(k); } catch (Exception e) { defs.AppendLine($"{k}: error {(e.InnerException ?? e).Message}"); continue; }
@@ -50,7 +50,7 @@ namespace MarsMod
                     prefabs.AppendLine($"######## kind {k} '{d.displayName}' prefab '{d.prefab.name}'");
                     Walk(d.prefab.transform, 0, prefabs, materials);
                     prefabs.AppendLine();
-                    renderQueue.Add((k, d));
+                    renderQueue.Add((k, d.displayName ?? d.name, d.prefab));
                 }
             }
 
@@ -93,6 +93,12 @@ namespace MarsMod
             foreach (var m in materials.Values) DumpMaterial(m, mats);
             File.WriteAllText(Path.Combine(Dir, "materials.txt"), mats.ToString());
 
+            // Mars models that are not buildings: the outpost, meteorite and mines.
+            int w = 0;
+            foreach (var name in new[] { "outpost", "meteor", "mine", "mine_ice" })
+            {
+                try { renderQueue.Add((900 + w++, "Mars " + name, Models.Get(name).Root)); } catch (Exception e) { defs.AppendLine($"model {name}: {e.Message}"); }
+            }
             yield return $"{found} structure kinds, {renderQueue.Count} prefabs, {materials.Count} materials written to BepInEx/MarsMod/research.";
             yield return "Rendering reference pictures of every machine now (a few seconds, the screen may stutter)…";
             renderIndex = 0; renderView = 0; rendering = true; frameWait = 0;
@@ -176,7 +182,7 @@ namespace MarsMod
 
         // ------------------------------------------------------------------ reference renders
 
-        static readonly List<(int kind, MoonDepotBuildDefinition def)> renderQueue = new List<(int, MoonDepotBuildDefinition)>();
+        static readonly List<(int kind, string name, GameObject prefab)> renderQueue = new List<(int, string, GameObject)>();
         static bool rendering;
         static int renderIndex, renderView, frameWait;
         static GameObject stage, clone, camGo;
@@ -220,7 +226,7 @@ namespace MarsMod
                     if (renderView >= 2) { renderView = 0; renderIndex++; DestroyClone(); }
                 }
                 if (renderIndex >= renderQueue.Count) { Finish(); return; }
-                if (clone == null) MakeClone(renderQueue[renderIndex].def);
+                if (clone == null) MakeClone(renderQueue[renderIndex].prefab);
                 Aim(renderView);
                 cam.enabled = true;
                 frameWait = 1;
@@ -228,7 +234,7 @@ namespace MarsMod
             catch (Exception e) { Plugin.Log.LogWarning("[research] render failed: " + (e.InnerException ?? e)); Finish(); }
         }
 
-        static void MakeClone(MoonDepotBuildDefinition def)
+        static void MakeClone(GameObject prefab)
         {
             if (stage == null)
             {
@@ -249,7 +255,7 @@ namespace MarsMod
             clone = new GameObject(); clone.name = "Mars research clone";
             clone.transform.SetParent(stage.transform, false);
             clone.layer = Layer;
-            if (def.prefab != null) Copy(def.prefab.transform, clone.transform);
+            if (prefab != null) Copy(prefab.transform, clone.transform);
         }
 
         /// <summary>Visual copy: only meshes and materials, none of the game's scripts.</summary>
@@ -309,7 +315,7 @@ namespace MarsMod
             cam.farClipPlane = dist + radius * 3f;
         }
 
-        static void Save((int kind, MoonDepotBuildDefinition def) item, int view)
+        static void Save((int kind, string name, GameObject prefab) item, int view)
         {
             var prev = RenderTexture.active;
             RenderTexture.active = rt;
@@ -319,7 +325,7 @@ namespace MarsMod
             tex.ReadPixels(r, 0, 0);
             tex.Apply();
             RenderTexture.active = prev;
-            string safe = new string((item.def.displayName ?? item.def.name ?? "x").Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray());
+            string safe = new string((item.name ?? "x").Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray());
             Png.Save(tex, Path.Combine(Dir, "renders", $"{item.kind:000}_{safe}_{view}.png"));
             UnityEngine.Object.Destroy(tex);
         }

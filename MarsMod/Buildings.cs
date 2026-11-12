@@ -77,6 +77,16 @@ namespace MarsMod
         }
 
         public static void StockChanged() => stockDirty = true;
+
+        /// <summary>Host: add an N-menu building record (rules and payment already checked).</summary>
+        public static Rec PlaceDirect(MarsCatalog.Def def, Vector3 pos, Quaternion rot, Mines.Mine mine, string owner)
+        {
+            var rec = new Rec { Id = Data.NextId++, Type = def.Id, Owner = owner, Px = pos.x, Py = pos.y, Pz = pos.z, Qx = rot.x, Qy = rot.y, Qz = rot.z, Qw = rot.w, Mine = mine?.Id ?? -1 };
+            if (mine != null) { rec.Px = mine.Position.x; rec.Py = mine.Position.y; rec.Pz = mine.Position.z; }
+            Data.List.Add(rec);
+            dirty = true; viewsDirty = true;
+            return rec;
+        }
         public static void Changed() { dirty = true; stockDirty = true; viewsDirty = true; }
 
         public static int Count(Dictionary<string, int> inv, string item) => inv != null && inv.TryGetValue(item, out var n) ? n : 0;
@@ -85,7 +95,7 @@ namespace MarsMod
 
         // ------------------------------------------------------------------ requests (anyone → host)
 
-        public enum Op : byte { Place = 1, Remove = 2, Use = 3, UseAlt = 4, Give = 5, Money = 6, Free = 7, Speed = 8, Clean = 9 }
+        public enum Op : byte { Place = 1, Remove = 2, Use = 3, UseAlt = 4, Give = 5, Money = 6, Free = 7, Speed = 8, Clean = 9, Cheat = 10 }
 
         /// <summary>Ask the host to do something (the host just does it).</summary>
         public static void Ask(Op op, Action<BinaryWriter> body)
@@ -133,9 +143,7 @@ namespace MarsMod
                     if (lack != null) return lack + ".";
                     if (!FreeBuild && !Pay(world, player, def.Price)) return $"Not enough money for the {def.Name} (${def.Price}).";
                     TakeItems(def);
-                    var rec = new Rec { Id = Data.NextId++, Type = type, Owner = player, Px = pos.x, Py = pos.y, Pz = pos.z, Qx = rot.x, Qy = rot.y, Qz = rot.z, Qw = rot.w, Mine = mine?.Id ?? -1 };
-                    if (mine != null) { rec.Px = mine.Position.x; rec.Py = mine.Position.y; rec.Pz = mine.Position.z; }
-                    Data.List.Add(rec);
+                    var rec = PlaceDirect(def, pos, rot, mine, player);
                     dirty = true; Sync(true);
                     Plugin.Log.LogMessage($"[build] {player} built {def.Name} #{rec.Id}");
                     return null;
@@ -188,6 +196,7 @@ namespace MarsMod
                     rec.Dust = 0f; dirty = true; Sync(true);
                     return $"{MarsCatalog.Get(rec.Type)?.Name ?? "Machine"} scrubbed clean.";
                 }
+                case Op.Cheat: { string what = r.ReadString(), arg = r.ReadString(); var msg = Cheats.Apply(what, arg, player); dirty = true; stockDirty = true; Sync(true); return msg; }
                 case Op.Free: FreeBuild = r.ReadBoolean(); VanillaBuild.SetPrices(); return "Free building " + (FreeBuild ? "ON" : "off") + " (for everyone in this world).";
                 case Op.Speed: SpeedCheat = Mathf.Clamp(r.ReadSingle(), 0.1f, 50f); return $"Machines run at {SpeedCheat:0.#}x speed.";
             }
