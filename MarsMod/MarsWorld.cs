@@ -276,24 +276,27 @@ namespace MarsMod
             PlayerReady = false; walkerSince = -1f;
             if (!marsWorld) return;
             marsWorld = false;
-            BuildMode.Reset();
-            Buildings.ClearViews();
-            Shields.Clear();
-            DustTiers.Reset();
-            Ending.Reset();
-            Goals.Reset(); goalsShown = false;
-            Meteors.Reset();
-            Belts.Reset();
-            LogicGates.Reset();
-            DustDevils.Reset();
-            MarketBoards.Reset();
-            VanillaBuild.Reset();
-            Market.Reset();
-            Mines.Clear();
-            MarsData.Close();
-            Models.WorldChanged();
+            // Each step on its own: one that throws must not leave the rest of the world behind (2026-11-12: a save
+            // error in the first step kept the market ticker on screen in the main menu).
+            void Step(string name, Action act) { try { act(); } catch (Exception e) { Plugin.Log.LogWarning($"[world] leaving: {name} failed: {e}"); } }
+            Step("build mode", BuildMode.Reset);
+            Step("buildings", Buildings.ClearViews);
+            Step("shields", Shields.Clear);
+            Step("tiers", DustTiers.Reset);
+            Step("ending", Ending.Reset);
+            Step("goals", () => { Goals.Reset(); goalsShown = false; });
+            Step("meteors", Meteors.Reset);
+            Step("belts", Belts.Reset);
+            Step("gates", LogicGates.Reset);
+            Step("devils", DustDevils.Reset);
+            Step("boards", MarketBoards.Reset);
+            Step("build menu", VanillaBuild.Reset);
+            Step("market", Market.Reset);
+            Step("mines", Mines.Clear);
+            Step("data", MarsData.Close);
+            Step("models", Models.WorldChanged);
             solar = null;
-            Haze.Remove();
+            Step("haze", Haze.Remove);
         }
 
         static void LogSlots()

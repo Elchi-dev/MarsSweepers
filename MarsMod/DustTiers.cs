@@ -24,9 +24,10 @@ namespace MarsMod
         static readonly string[] Colours = { "#C9B8A6", "#FFC266", "#FF9A5A", "#C58BFF" };
 
         static Vector3 home = Vector3.up;
+        static float homeRadius = 2000f;
         static int seed;
 
-        public static void Setup(Vector3 homeCollector, int worldSeed) { home = homeCollector.normalized; seed = worldSeed; }
+        public static void Setup(Vector3 homeCollector, int worldSeed) { home = homeCollector.normalized; homeRadius = homeCollector.magnitude; seed = worldSeed; }
 
         static float Noise(Vector3 d)
         {
@@ -41,10 +42,14 @@ namespace MarsMod
         public static int TierAt(Vector3 direction)
         {
             var d = direction.normalized;
-            float far = Vector3.Angle(d, home) / 180f;          // 0 at home, 1 on the far side
-            float v = Noise(d) * 0.65f + far * 0.9f;
-            if (v > 0.95f) return 3;
-            if (v > 0.6f) return 2;
+            // Distance over the ground from the Collector, in metres: fine dust around the base, drifts from about
+            // 1 km, crust from about 1.5 km, magnetite crust from about 2.5 km (the planet's radius is about 2 km).
+            float metres = Vector3.Angle(d, home) * Mathf.Deg2Rad * Mathf.Max(500f, homeRadius);
+            if (metres < 250f) return 0;                                // the base is always fine dust
+            float far = Mathf.Clamp01((metres - 250f) / 2500f);
+            float v = far + Noise(d * (Mathf.Max(500f, homeRadius) / 700f)) * 0.45f;   // patches of a few hundred metres
+            if (v > 0.85f) return 3;
+            if (v > 0.55f) return 2;
             if (v > 0.25f) return 1;
             return 0;
         }

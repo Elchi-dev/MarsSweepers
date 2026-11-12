@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net6.0</TargetFramework><RollForward>Major</RollForward><Nullable>disable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Reference Include="../../MarsMod/bin/Release/net6.0/MarsMod.dll" />
+  </ItemGroup>
+</Project>

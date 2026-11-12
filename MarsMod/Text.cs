@@ -208,6 +208,9 @@ namespace MarsMod
                     {
                         var comp = new UnityEngine.Component(o.Pointer);
                         if (!Look.InScene(comp.gameObject)) continue;
+                        // Our own HUD boxes and signs ("Mars goal", "Mars market screen text") mean the Moon when they say it.
+                        var tgo = comp.gameObject; var par = tgo.transform.parent;
+                        if (tgo.name.StartsWith("Mars ") || par != null && par.name.StartsWith("Mars ")) continue;
                         // During the intro the contract pages are rendered from hidden texts, so include those too.
                         if (!IntroIsMars && !comp.gameObject.activeInHierarchy) continue;
                         object w = Activator.CreateInstance(t, o.Pointer);

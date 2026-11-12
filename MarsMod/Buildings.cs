@@ -30,8 +30,8 @@ namespace MarsMod
             public float Burn;          // a generator's seconds of fuel left in the chamber
             public float Supply = 1f;   // share of its power the grid gives it (0..1), set by the host
             public bool Active;         // a shield's dome is up
-            public Vector3 Pos => new Vector3(Px, Py, Pz);
-            public Quaternion Rot => new Quaternion(Qx, Qy, Qz, Qw);
+            [System.Text.Json.Serialization.JsonIgnore] public Vector3 Pos => new Vector3(Px, Py, Pz);
+            [System.Text.Json.Serialization.JsonIgnore] public Quaternion Rot => new Quaternion(Qx, Qy, Qz, Qw);
         }
 
         public sealed class State
@@ -277,6 +277,26 @@ namespace MarsMod
         }
 
         // ------------------------------------------------------------------ placement rules (everyone checks, host decides)
+
+        /// <summary>Height difference of the ground under a building's corners (metres).</summary>
+        public static float Unevenness(MarsCatalog.Def def, Vector3 pos)
+        {
+            try
+            {
+                var t = Commands.World.Terrain;
+                var up = pos.normalized;
+                var e = Vector3.Cross(up, Vector3.forward); if (e.sqrMagnitude < 1e-4f) e = Vector3.right; e.Normalize();
+                var n = Vector3.Cross(up, e);
+                float lo = float.MaxValue, hi = float.MinValue;
+                foreach (var off in new[] { e + n, e - n, -e + n, -e - n, Vector3.zero })
+                {
+                    float h = t.SurfacePoint((pos + off * def.Radius).normalized).magnitude;
+                    lo = Mathf.Min(lo, h); hi = Mathf.Max(hi, h);
+                }
+                return hi - lo;
+            }
+            catch { return 0f; }
+        }
 
         public static string CanPlace(MarsCatalog.Def def, Vector3 pos, out Mines.Mine mine)
         {
@@ -558,7 +578,8 @@ namespace MarsMod
 
         public static void ClearViews()
         {
-            if (MarsNet.IsHost && MarsData.Loaded) Sync(true);   // nothing unsaved is lost when leaving
+            try { if (MarsNet.IsHost && MarsData.Loaded) Sync(true); }   // nothing unsaved is lost when leaving
+            catch (Exception e) { Plugin.Log.LogError("[build] saving on leave failed: " + e.Message); }
             foreach (var kv in views) if (kv.Value != null && kv.Key < VanillaIds) UnityEngine.Object.Destroy(kv.Value);
             views.Clear(); viewsDirty = true; worldSynced = false;
             Data = new State(); Items = new Stock();

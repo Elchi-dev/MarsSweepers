@@ -162,7 +162,7 @@ namespace MarsMod
                 var def = defs[i];
                 string result = null;
                 // Up to 8 tries per building: further out each time.
-                for (int t = 0; t < 8; t++)
+                for (int t = 0; t < 14; t++)
                 {
                     Vector3 pos;
                     if (def.NeedsMine)
@@ -178,6 +178,7 @@ namespace MarsMod
                         pos = world.Terrain.SurfacePoint(dir);
                     }
                     string why = Buildings.CanPlace(def, pos, out var mine);
+                    if (why == null && !def.NeedsMine && Buildings.Unevenness(def, pos) > 0.5f) why = "uneven ground";   // N-menu buildings have no foundation
                     if (why != null) { result = why; continue; }
                     var rot = Quaternion.FromToRotation(Vector3.up, pos.normalized);
                     Buildings.PlaceDirect(def, pos, rot, mine, "selftest");

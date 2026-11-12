@@ -13,9 +13,10 @@ for k in range(14):
 rock("crater floor", (0, 0, -0.35), 1.8, "mars:martian rock dark", 7, squash=0.15, detail=3, jitter=0.05)
 # the meteorite: dark, with glowing cracks
 rock("meteorite", (0, 0, 0.45), 0.85, "mars:alien dark", 11, squash=0.8, detail=3, jitter=0.12)
-for k in range(7):
-    a = rnd.uniform(0, math.tau); z = rnd.uniform(0.2, 0.9)
-    box(f"crack {k}", (0.6, 0.09, 0.09), (math.cos(a) * 0.84, math.sin(a) * 0.84, z), "mars:furnace glow", bevel=0.01, rot=(rnd.uniform(-0.6, 0.6), 0, a + math.pi / 2))
+# glowing hot spots on the surface (small, flush with the rock)
+for k in range(6):
+    a = rnd.uniform(0, math.tau); z = rnd.uniform(0.25, 0.75)
+    sphere(f"hot spot {k}", (math.cos(a) * 0.74, math.sin(a) * 0.74, z), rnd.uniform(0.07, 0.12), "mars:furnace glow", seg=12)
 for k in range(4):
     a = rnd.uniform(0, math.tau)
     bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.14, location=(math.cos(a) * 0.55, math.sin(a) * 0.55, 0.95 + rnd.uniform(-0.1, 0.1)))

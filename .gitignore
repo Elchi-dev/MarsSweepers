@@ -4,3 +4,5 @@ dist/
 __pycache__/
 /lib/*
 !/lib/README.md
+tools/jsoncheck/bin/
+tools/jsoncheck/obj/

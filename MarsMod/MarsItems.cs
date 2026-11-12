@@ -29,6 +29,14 @@ namespace MarsMod
         }.ToDictionary(i => i.Id);
 
         public static string Name(string id) => All.TryGetValue(id, out var i) ? i.Name : id;
+
+        static readonly Dictionary<string, string> shortNames = new Dictionary<string, string>
+        {
+            ["hematite"] = "Ore", ["basalt"] = "Basalt", ["ice"] = "Ice", ["iron_plate"] = "Plate", ["basalt_grit"] = "Grit",
+            ["basalt_fiber"] = "Fiber", ["machine_part"] = "Part", ["oxygen"] = "O2", ["hydrogen"] = "H2", ["rocket_fuel"] = "Fuel", ["alien_alloy"] = "Alloy",
+        };
+        /// <summary>A short name for the ticker.</summary>
+        public static string Short(string id) => shortNames.TryGetValue(id, out var s) ? s : Name(id);
         public static float Sell(string id) => All.TryGetValue(id, out var i) ? i.Sell : 0f;
 
         public static string List(Dictionary<string, int> inv)

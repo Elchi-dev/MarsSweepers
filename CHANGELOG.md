@@ -3,6 +3,29 @@
 Mars Sweepers (the mod), MarsSetup (the installer) and MarsProbe (the research
 plugin). Newest first.
 
+## 0.10.1
+
+### Fixed (from the first 0.10.0 test, 2026-11-12)
+- Mars buildings were never saved or synced: the save data included the
+  buildings' position as a Unity Vector3, which the JSON writer cannot
+  write (it recurses into `normalized`). Every request to the host then
+  failed after doing its work, and leaving a Mars world stopped half way
+  (that is why the market ticker stayed in the main menu). The positions
+  are kept out of the JSON now, and the build checks every save data type
+  for Unity members (tools/jsoncheck).
+- Leaving a Mars world runs every clean-up step on its own.
+- Our HUD no longer covers the game's: the goal box and the backpack moved
+  to the left, all Mars boxes and the ticker hide while a game menu is
+  open, the ticker is one short line.
+- The Mars text pass no longer rewrites our own boxes ("fire the planet
+  cannon at the Moon" said "at Mars").
+- A shield waiting for a storm says "standby" instead of a power share.
+- Dust tiers by distance in metres: fine around the base, drifts from about
+  1 km, crust from about 1.5 km, magnetite crust from about 2.5 km.
+- `buildall` and `selftest` only build on even ground (N-menu buildings
+  have no foundation), and try further out.
+- The meteorite's glow bars are small hot spots now.
+
 ## 0.10.0
 
 ### Added

@@ -145,6 +145,8 @@ namespace MarsMod
 
         public static string Line(Buildings.Rec b, Def d)
         {
+            if (d.Role == Role.Shield && !Shields.Wanted) return $"  ·  standby (draws {d.PowerUse:0} kW in a storm)";
+            if (d.Role == Role.Cannon && !Machines.Busy(b, d)) return $"  ·  needs {d.PowerUse:0} kW once loaded";
             if (d.PowerUse > 0f)
             {
                 if (b.Supply >= 0.99f) return $"  ·  <color=#7CFF9A>{d.PowerUse:0} kW ok</color>";

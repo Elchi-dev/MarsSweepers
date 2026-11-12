@@ -129,15 +129,15 @@ namespace MarsMod
 
         static void Ticker()
         {
-            if (ticker == null) ticker = MarsUi.Make("Mars market ticker", 0.5f, 0.975f, 900, 40, 19, 514);
-            bool show = MarsWorld.PlayerReady && !Terminal.Open && MarsProfile.MarketTicker.Value;
+            if (ticker == null) ticker = MarsUi.Make("Mars market ticker", 0.5f, 0.985f, 1500, 34, 16, 514);
+            bool show = MarsWorld.InMarsWorld && MarsWorld.PlayerReady && !Terminal.Open && !MarsUi.GameMenuOpen && MarsProfile.MarketTicker.Value;
             if (!show) { ticker.Set(null); return; }
-            var sb = new StringBuilder("<color=#E8743B><b>MARKET</b></color>   ");
+            var sb = new StringBuilder("<color=#E8743B><b>MARKET $</b></color>  ");
             foreach (var id in MarsItems.All.Keys)
             {
                 bool ev = Data.EventItem == id && Data.Minutes < Data.EventUntil;
                 sb.Append(ev ? (Data.EventFactor > 1f ? "<color=#7CFF9A>" : "<color=#FF6B5A>") : "<color=#F2E6DA>");
-                sb.Append($"{MarsItems.Name(id)} ${Price(id):0.0}</color> {Arrow(id)}    ");
+                sb.Append($"{MarsItems.Short(id)} {Price(id):0.0}</color>{Arrow(id)}  ");
             }
             ticker.Set(sb.ToString().TrimEnd());
         }

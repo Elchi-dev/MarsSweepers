@@ -44,11 +44,12 @@ namespace MarsMod
                 menuBox = MarsUi.Make("Mars build menu", 0.5f, 0.56f, 820, 430, 24, 257);
                 hintBox = MarsUi.Make("Mars build hint", 0.5f, 0.13f, 1000, 92, 22, 514);
                 promptBox = MarsUi.Make("Mars prompt", 0.5f, 0.24f, 1000, 92, 22, 514);
-                packBox = MarsUi.Make("Mars backpack", 0.985f, 0.66f, 380, 210, 20, 257);
-                goalBox = MarsUi.Make("Mars goal", 0.985f, 0.93f, 380, 78, 16, 257);
+                // Left side: the game keeps the top right (sector) and the right edge (key hints) for itself.
+                goalBox = MarsUi.Make("Mars goal", 0.012f, 0.955f, 420, 74, 16, 257);
+                packBox = MarsUi.Make("Mars backpack", 0.012f, 0.86f, 300, 220, 18, 257);
             }
             var kb = UnityInput.Current;
-            bool ui = !Terminal.Open && MarsWorld.PlayerReady;
+            bool ui = !Terminal.Open && MarsWorld.PlayerReady && !MarsUi.GameMenuOpen;
             if (!ui) { menuBox.Set(null); hintBox.Set(null); promptBox.Set(null); packBox.Set(null); goalBox.Set(null); goalText = null; return; }
             if (now >= nextGoal)
             {

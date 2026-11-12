@@ -10,7 +10,7 @@
     <Nullable>disable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
-    <Version>0.10.0</Version>
+    <Version>0.10.1</Version>
     <Product>Mars Sweepers setup</Product>
     <Description>Installs Mars Sweepers (BepInEx, the Mars mod) into Moon Sweepers. Start with --dev for the tester tools.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>

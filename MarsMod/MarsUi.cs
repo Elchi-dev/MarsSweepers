@@ -51,6 +51,21 @@ namespace MarsMod
             catch (Exception e) { Plugin.Log.LogError("[hud] " + e); root = null; return false; }
         }
 
+        /// <summary>A game menu (build menu, upgrade tree, map, pause) is open: our HUD steps aside.</summary>
+        public static bool GameMenuOpen
+        {
+            get
+            {
+                float now = Time.realtimeSinceStartup;
+                if (now - menuCheckedAt < 0.2f) return menuOpen;
+                menuCheckedAt = now;
+                menuOpen = false;
+                try { var w = Commands.FindWalker(); menuOpen = w != null && w.MenuBlocked; } catch { }
+                return menuOpen;
+            }
+        }
+        static bool menuOpen; static float menuCheckedAt = -1f;
+
         /// <summary>A text box anchored at (ax, ay) of the screen (0..1), pivoted there, with a dark panel behind.</summary>
         public static Box Make(string name, float ax, float ay, float width, float height, float size, int align, bool panel = true)
         {

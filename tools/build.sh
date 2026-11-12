@@ -9,6 +9,7 @@ done
 ./native/dstorage-proxy/build.sh >/dev/null
 dotnet build MarsProbe -c Release -nologo -v q
 dotnet build MarsMod -c Release -nologo -v q
+dotnet run --project tools/jsoncheck -nologo -v q 2>&1 | grep -v NETSDK1138 || { echo "save data check failed" >&2; exit 1; }
 dotnet build MarsSetup -c Release -nologo -v q
 mkdir -p dist
 cp MarsSetup/bin/Release/net48/MarsSetup.exe dist/MarsSetup.exe
