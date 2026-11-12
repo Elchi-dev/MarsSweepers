@@ -30,7 +30,8 @@ is famous for being covered in dust.
 Mars Sweepers adds Mars as its own world. When you start a new save slot
 you pick Moon or Mars. Moon worlds stay exactly as the game made them; Mars
 worlds get their own save folder, their own valley and landforms, red dust,
-a thicker sky, dust storms that roll in as a wall, ore mines and machines.
+a thicker sky, dust storms that roll in as a wall, ore mines, machines,
+power and shields, alien traders, and an ending the Moon will not like.
 Everything is built for co-op: the host runs Mars, the crew sees the same
 planet.
 
@@ -92,6 +93,8 @@ Everything follows from that:
 | **Dev terminal** | Ctrl+Shift+K: storms, haze, time, teleport, fly, models, research, test money |
 | **MarsSetup** | One `.exe` with a window: Install, Play. Testers start it with `--dev` for the guided test and the report |
 | **MarsProbe** | Reads the game: types, scenes, definitions, call traces |
+
+![The buildings new in 0.10 (Blender renders of the in-game models)](docs/images/machines-0.10.webp)
 
 ---
 
